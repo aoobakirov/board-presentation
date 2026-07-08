@@ -1,0 +1,5 @@
+work/
+*.pdf
+lo_profile/
+__pycache__/
+*.log
