@@ -156,6 +156,20 @@ def kpi_chip(slide, x, y, w, h, big, unit, label, big_c=STEEL, on_dark=False, bi
            (LBLUE if on_dark else INK), 'Calibri', line_spacing=1.0)
     return r
 
+def source_note(slide, s, x=40, y=360, on_dark=False):
+    c = RGBColor(0x6F,0x82,0x98) if on_dark else RGBColor(0x9A,0xA6,0xB3)
+    return simple(slide, x, y, 560, 12, s, 7, False, c, 'Calibri')
+
+def hrule(slide, y, x=40, w=641, color=BORDER, wt=0.75):
+    return line_seg(slide, x, y, w, 0, color, wt)
+
+def header_mark(slide, y=25, x=40, h=32, color=COPPER):
+    """Thin vertical accent bar as a section marker; content indents to x+12."""
+    return rect(slide, x, y, 3, h, fill=color)
+
+def card_head(slide, x, y, w, s, color=NAVY, sz=9.5):
+    return simple(slide, x, y, w, 14, s, sz, True, color, 'Calibri')
+
 def clean_table(tbl):
     """Strip default banded table style; use plain no-grid so manual fills show cleanly."""
     tblPr = tbl._tbl.find(qn('a:tblPr'))
