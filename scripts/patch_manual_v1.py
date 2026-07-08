@@ -8,7 +8,7 @@ from pptx.util import Pt
 from pptx.dml.color import RGBColor
 from pptx.chart.data import CategoryChartData
 
-SRC = "work/base_v1.pptx"
+SRC = "source/base_manual_v1.pptx"
 OUT = "KazBioFert_Board_Presentation_FINAL_20260709.pptx"
 
 prs = Presentation(SRC)
@@ -70,6 +70,47 @@ for sh in s.shapes:
             to_remove.append(sh)
 for sh in to_remove:
     sh._element.getparent().remove(sh._element)
+
+# ---------- COST OF GOODS -> $330/t (slides 15, 18, 19) ----------
+# price kept at $450/t  =>  unit gross margin = 450-330 = $120/t = ~27%
+def find_text(slide, exact):
+    for sh in slide.shapes:
+        if sh.has_text_frame and sh.text_frame.text.strip() == exact:
+            return sh
+    return None
+
+yB, scale = 270.0, (270.0 - 150.0) / 630.0   # cost-bridge baseline & px/$ scale
+
+# --- slide 18: pricing / economics ---
+s = prs.slides[17]
+set_full_text(find_text(s, 'Себестоимость ОМУ $233/т при цене реализации $450/т'),
+              'Себестоимость ОМУ $330/т при цене реализации $450/т')
+set_full_text(find_text(s, 'ОМУ NPK 8-21: сырьё $194 + производство (с пост. расходами) $39 = $233/т; валовая маржа ≈ 48%'),
+              'ОМУ NPK 8-21: себестоимость $330/т (сырьё + производство); цена $450/т; валовая маржа ≈ 27% ($120/т)')
+newh = 330 * scale
+lbl = find_text(s, '$233'); set_full_text(lbl, '$330'); lbl.top = Pt(yB - newh - 16)
+for sh in s.shapes:                          # green cost bar -> new height
+    try:
+        if sh.fill.type is not None and 'SOLID' in str(sh.fill.type) \
+           and str(sh.fill.fore_color.rgb) == '5B8C6E':
+            sh.top = Pt(yB - newh); sh.height = Pt(newh)
+    except Exception:
+        pass
+set_full_text(find_text(s, '≈48%'), '≈27%')
+set_full_text(find_text(s, '$217 на тонну ОМУ'), '$120 на тонну ОМУ')
+
+# --- slide 15: divider KPI ---
+s = prs.slides[14]
+set_full_text(find_text(s, '≈48%'), '≈27%')
+set_full_text(find_text(s, 'валовая маржа ОМУ · $233 себест. → $450 цена'),
+              'валовая маржа ОМУ · $330 себест. → $450 цена')
+
+# --- slide 19: thesis KPI + bullet ---
+s = prs.slides[18]
+set_full_text(find_text(s, '≈48%'), '≈27%')
+set_full_text(find_text(s, 'валовая маржа ОМУ ($217/т)'), 'валовая маржа ОМУ ($120/т)')
+set_full_text(find_text(s, 'Локальная себестоимость ($233/т)  защищают маржу от волатильности мировых цен.'),
+              'Локальная себестоимость ($330/т) защищает маржу от волатильности мировых цен.')
 
 prs.save(OUT)
 print("saved", OUT, "slides:", len(prs.slides._sldIdLst))
