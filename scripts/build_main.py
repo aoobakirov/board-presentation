@@ -97,7 +97,7 @@ def slide_divider():
              big_c=TAN, on_dark=True, big_sz=24)
     kpi_chip(s, 262, 302, 196, 56, '1,3', 'млн т', 'ёмкость рынка удобрений РК, 2025 (+19% г/г)',
              big_c=LBLUE, on_dark=True, big_sz=24)
-    kpi_chip(s, 468, 302, 212, 56, '≈48%', '', 'валовая маржа ОМУ · $233 себест. → $450 цена',
+    kpi_chip(s, 468, 302, 212, 56, '≈52%', '', 'валовая маржа ОМУ · $233 себест. → $487 цена',
              big_c=WHITE, on_dark=True, big_sz=24)
     footer(s, 15, 'АНАЛИЗ РЫНКА · РАЗДЕЛ', on_dark=True)
     return s
@@ -165,7 +165,7 @@ def slide_kz():
     style_cat(ch, 8); style_val(ch, 7.5, mx=380)
     kpi_chip(s, 442, 106, 238, 44, '1,3', 'млн т', 'ёмкость рынка РК, 2025 (+19% г/г)', big_c=STEEL, big_sz=22)
     kpi_chip(s, 442, 154, 238, 44, '43,6%', '', 'самообеспеченность по азоту (фосфор — 98,5%)', big_c=COPPER, big_sz=22)
-    kpi_chip(s, 442, 202, 238, 44, '≈ 6%', '', 'доля завода (75 тыс т ОМУ) в потреблении РК', big_c=STEEL, big_sz=22)
+    kpi_chip(s, 442, 202, 238, 44, '≈ 6%', '', 'доля завода (80 тыс т ОМУ) в потреблении РК', big_c=STEEL, big_sz=22)
     rect(s, 442, 250, 238, 42, fill=PANEL, line=BORDER, round_=0.10)
     simple(s, 454, 255, 214, 11, 'СТРУКТУРА ИМПОРТА (стоимость)', 7.4, True, GRAY, 'Calibri', spc=0.5)
     text(s, 454, 270, 214, 20, [[
@@ -173,7 +173,7 @@ def slide_kz():
         {'t':'    ·    Узбекистан ','sz':10,'b':False,'c':INK,'f':'Calibri'},{'t':'11%','sz':10,'b':True,'c':STEEL,'f':'Calibri'}]])
     insight(s, 'ИМПОРТОЗАМЕЩЕНИЕ:',
             'внесение в 15–20× ниже нормы и рост импорта (552 → 700 тыс т за 2023–2025) формируют структурный, '
-            'растущий спрос на доступные ОМУ; завод (75 тыс т) закрывает ≈ 11% импорта РК.')
+            'растущий спрос на доступные ОМУ; завод (80 тыс т) закрывает ≈ 11% импорта РК.')
     source_note(s, 'Источники: Бюро нацстатистики РК; EnergyProm / ElDala, 2025; FAO, World Bank (внесение). Показатели — товарный тоннаж.')
     footer(s, 17, 'АНАЛИЗ РЫНКА · КАЗАХСТАН')
     return s
@@ -182,23 +182,23 @@ def slide_kz():
 def slide_price():
     s = add_blank(prs, WHITE)
     header(s, 'ЦЕНОВОЕ ПОЗИЦИОНИРОВАНИЕ  ·  ЭКОНОМИКА ОМУ',
-           'Себестоимость ОМУ $233/т при цене реализации $450/т',
-           'ОМУ NPK 8-21: сырьё $194 + производство (с пост. расходами) $39 = $233/т; валовая маржа ≈ 48%')
+           'Цена ОМУ $487/т ниже импортного паритета $630/т',
+           'Цена реализации по фин. модели $487/т; себестоимость $233/т (сырьё $194 + производство $39); валовая маржа ≈ 52%')
     rect(s, 40, 106, 232, 186, fill=WHITE, line=BORDER, round_=0.05, shadow=True)
     card_head(s, 54, 115, 200, 'Экономика 1 т ОМУ, $/т')
     yB = 270; topY = 150; maxv = 630.0; scale = (yB - topY) / maxv
-    for bx, v, col, lab in [(62,233,GREENT,'Себест.'),(120,450,STEEL,'Цена'),(178,630,NAVY,'Импорт')]:
+    for bx, v, col, lab in [(62,233,GREENT,'Себест.'),(120,487,STEEL,'Цена'),(178,630,NAVY,'Импорт')]:
         h = v*scale; y = yB - h
         rect(s, bx, y, 42, h, fill=col, round_=0.04)
         simple(s, bx-6, y-16, 54, 14, '$%d'%v, 9.5, True, col, 'Calibri', PP_ALIGN.CENTER)
         simple(s, bx-6, yB+3, 54, 12, lab, 7.8, False, GRAY, 'Calibri', PP_ALIGN.CENTER)
     line_seg(s, 54, yB, 200, 0, BORDER, 0.75)
     rect(s, 280, 106, 150, 186, fill=NAVY, round_=0.05, shadow=True)
-    simple(s, 292, 130, 126, 34, '≈48%', 30, True, TAN, 'Arial', PP_ALIGN.LEFT)
+    simple(s, 292, 130, 126, 34, '≈52%', 30, True, TAN, 'Arial', PP_ALIGN.LEFT)
     simple(s, 293, 166, 126, 14, 'валовая маржа', 10, True, WHITE, 'Calibri')
-    simple(s, 293, 182, 126, 12, '$217 на тонну ОМУ', 8.5, False, LBLUE, 'Calibri')
+    simple(s, 293, 182, 126, 12, '$254 на тонну ОМУ', 8.5, False, LBLUE, 'Calibri')
     line_seg(s, 293, 208, 118, 0, RGBColor(0x35,0x52,0x74), 0.75)
-    simple(s, 292, 220, 126, 26, '−29%', 22, True, TAN, 'Arial')
+    simple(s, 292, 220, 126, 26, '−23%', 22, True, TAN, 'Arial')
     simple(s, 293, 250, 126, 24, 'к цене импортного\nкомплексного аналога', 8.5, False, LBLUE, 'Calibri', line_spacing=1.0)
     rect(s, 440, 106, 240, 186, fill=WHITE, line=BORDER, round_=0.05, shadow=True)
     simple(s, 452, 114, 220, 12, 'ЦЕНЫ КОНКУРЕНТОВ, $/т', 8.4, True, GRAY, 'Calibri', spc=0.5)
@@ -227,9 +227,9 @@ def slide_price():
             if i > 0 and j >= 2: r.font.color.rgb = STEEL; r.font.bold = True
             cell_border(c, ('bottom',), (RGBColor(0x35,0x52,0x74) if i==0 else BORDER), 0.75)
     insight(s, 'ПРЕИМУЩЕСТВО:',
-            'ОМУ на ≈ 29% дешевле импортных комплексных удобрений (~$630/т) при эффективности питательных веществ '
+            'ОМУ на ≈ 23% дешевле импортных комплексных удобрений (~$630/т) при эффективности питательных веществ '
             '1:3 (ФАО) и локальном сырье — устойчивая юнит-экономика независимо от глобальных цен.')
-    source_note(s, 'Источники: маркетинговый анализ проекта, 2026; World Bank, 06.2026; ФАО (эффективность 1:3). Цены — ориентировочные, до подтверждения контрактами.')
+    source_note(s, 'Цена реализации — по фин. модели FEM v11.5 ($487/т, к выходу ≈57% валовой маржи); рыночная средняя ≈$450/т; импорт ~$630/т (World Bank, 06.2026); эффективность 1:3 (ФАО).')
     footer(s, 18, 'АНАЛИЗ РЫНКА · ЦЕНЫ И ЭКОНОМИКА')
     return s
 
@@ -243,15 +243,15 @@ def slide_thesis():
     W = 151
     xs = [40, 40+W+12, 40+2*(W+12), 40+3*(W+12)]
     kpis = [('1,3','млн т','ёмкость рынка РК — адресный спрос',TAN),
-            ('≈11%','','доля завода в импорте РК (75 тыс т)',LBLUE),
-            ('$34','млн/год','выручка ОМУ (75 тыс т × $450/т)',WHITE),
-            ('≈48%','','валовая маржа ОМУ ($217/т)',TAN)]
+            ('≈11%','','доля завода в импорте РК (80 тыс т)',LBLUE),
+            ('≈24','млрд ₸','пиковая выручка (~$36 млн) — фин. модель',WHITE),
+            ('≈57%','','валовая маржа на выходе (фин. модель)',TAN)]
     for x,(big,unit,lab,col) in zip(xs,kpis):
         kpi_chip(s, x, 108, W, 64, big, unit, lab, big_c=col, on_dark=True, big_sz=23)
     rect(s, 40, 186, 640, 92, fill=NAVYDK, line=RGBColor(0x24,0x3A,0x59), line_w=1.0, round_=0.04)
     bullets = [
         'Импортозамещение — государственный приоритет: спрос структурный и растущий, не привязан к сырьевому суперциклу.',
-        'Ценовое преимущество: ОМУ на ≈ 29% дешевле импортных комплексных удобрений (~$630/т) при эффективности 1:3 (ФАО).',
+        'Ценовое преимущество: ОМУ на ≈ 23% дешевле импортных комплексных удобрений (~$630/т) при эффективности 1:3 (ФАО).',
         'Локальная себестоимость ($233/т) и короткое логистическое плечо ($25/т) защищают маржу от волатильности мировых цен.']
     by = 196
     for b in bullets:
@@ -263,7 +263,7 @@ def slide_thesis():
         {'t':'ПРОЕКТНАЯ ЭКОНОМИКА:  ','sz':10,'b':True,'c':NAVY,'f':'Calibri'},
         {'t':'IRR 31%  ·  NPV ≈ 30,8 млрд ₸  ·  окупаемость ≈ 5 лет  —  подтверждается рыночной позицией (цена ОМУ $450/т).',
          'sz':10,'b':True,'c':RGBColor(0x3A,0x2A,0x12),'f':'Calibri'}]], anchor=MSO_ANCHOR.MIDDLE)
-    source_note(s, 'Расчёты менеджмента на основе проектных данных (≥75 тыс т/год, цена $450/т) и рыночных источников IFA / World Bank / БНС РК.', on_dark=True)
+    source_note(s, 'Фин. модель FEM v11.5 (4,95 МВт · 80 тыс т ОМУ · цена $487/т · 80/20): IRR проекта 31,08%, NPV 30,77 млрд ₸, WACC 12,71%, окупаемость 5,1 г.', on_dark=True)
     footer(s, 19, 'АНАЛИЗ РЫНКА · ИНВЕСТИЦИОННЫЙ ТЕЗИС', on_dark=True)
     return s
 
@@ -272,6 +272,15 @@ n0 = len(prs.slides._sldIdLst)
 slide_divider(); slide_world(); slide_kz(); slide_price(); slide_thesis()
 for k in range(5):
     move_slide(prs, n0 + k, 14 + k)
+
+# ---- align existing slides to the financial model (FEM v11.5) ----
+for sl in prs.slides:
+    for sh in sl.shapes:
+        if sh.has_text_frame:
+            for p in sh.text_frame.paragraphs:
+                for r in p.runs:
+                    if '75 000' in r.text:            # product capacity -> model 80 000 t/y
+                        r.text = r.text.replace('75 000', '80 000')
 
 # ---- renumber footer page numbers ----
 for idx, sl in enumerate(prs.slides):
