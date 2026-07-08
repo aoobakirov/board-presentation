@@ -71,44 +71,63 @@ for sh in s.shapes:
 for sh in to_remove:
     sh._element.getparent().remove(sh._element)
 
-# ---------- COST OF GOODS -> $330/t (slides 15, 18, 19) ----------
-# price kept at $450/t  =>  unit gross margin = 450-330 = $120/t = ~27%
+# ---------- UNIT ECONOMICS: cost $330/t, price $500/t (slides 15, 18, 19) ----------
+# gross margin = (500-330)/500 = $170/t = ~34% ; discount vs import = (630-500)/630 = ~21%
 def find_text(slide, exact):
     for sh in slide.shapes:
         if sh.has_text_frame and sh.text_frame.text.strip() == exact:
             return sh
     return None
 
+def sub_text(slide, old, new):
+    hit = False
+    for sh in slide.shapes:
+        if sh.has_text_frame:
+            for p in sh.text_frame.paragraphs:
+                for r in p.runs:
+                    if old in r.text:
+                        r.text = r.text.replace(old, new); hit = True
+    return hit
+
+def resize_bar(slide, hexfill, dollars):
+    h = dollars * scale
+    for sh in slide.shapes:
+        try:
+            if sh.fill.type is not None and 'SOLID' in str(sh.fill.type) \
+               and str(sh.fill.fore_color.rgb) == hexfill:
+                sh.top = Pt(yB - h); sh.height = Pt(h)
+        except Exception:
+            pass
+    return yB - h
+
 yB, scale = 270.0, (270.0 - 150.0) / 630.0   # cost-bridge baseline & px/$ scale
 
 # --- slide 18: pricing / economics ---
 s = prs.slides[17]
 set_full_text(find_text(s, 'Себестоимость ОМУ $233/т при цене реализации $450/т'),
-              'Себестоимость ОМУ $330/т при цене реализации $450/т')
+              'Себестоимость ОМУ $330/т при цене реализации $500/т')
 set_full_text(find_text(s, 'ОМУ NPK 8-21: сырьё $194 + производство (с пост. расходами) $39 = $233/т; валовая маржа ≈ 48%'),
-              'ОМУ NPK 8-21: себестоимость $330/т (сырьё + производство); цена $450/т; валовая маржа ≈ 27% ($120/т)')
-newh = 330 * scale
-lbl = find_text(s, '$233'); set_full_text(lbl, '$330'); lbl.top = Pt(yB - newh - 16)
-for sh in s.shapes:                          # green cost bar -> new height
-    try:
-        if sh.fill.type is not None and 'SOLID' in str(sh.fill.type) \
-           and str(sh.fill.fore_color.rgb) == '5B8C6E':
-            sh.top = Pt(yB - newh); sh.height = Pt(newh)
-    except Exception:
-        pass
-set_full_text(find_text(s, '≈48%'), '≈27%')
-set_full_text(find_text(s, '$217 на тонну ОМУ'), '$120 на тонну ОМУ')
+              'ОМУ NPK 8-21: себестоимость $330/т (сырьё + производство); цена $500/т; валовая маржа ≈ 34% ($170/т)')
+lbl = find_text(s, '$233'); set_full_text(lbl, '$330'); lbl.top = Pt(resize_bar(s, '5B8C6E', 330) - 16)  # cost bar (green)
+lbl = find_text(s, '$450'); set_full_text(lbl, '$500'); lbl.top = Pt(resize_bar(s, '2F6690', 500) - 16)  # price bar (steel)
+set_full_text(find_text(s, '≈48%'), '≈34%')
+set_full_text(find_text(s, '$217 на тонну ОМУ'), '$170 на тонну ОМУ')
+set_full_text(find_text(s, '−29%'), '−21%')
+sub_text(s, '29%', '21%')                                # insight band
 
 # --- slide 15: divider KPI ---
 s = prs.slides[14]
-set_full_text(find_text(s, '≈48%'), '≈27%')
+set_full_text(find_text(s, '≈48%'), '≈34%')
 set_full_text(find_text(s, 'валовая маржа ОМУ · $233 себест. → $450 цена'),
-              'валовая маржа ОМУ · $330 себест. → $450 цена')
+              'валовая маржа ОМУ · $330 себест. → $500 цена')
 
-# --- slide 19: thesis KPI + bullet ---
+# --- slide 19: thesis KPI + bullet + source ---
 s = prs.slides[18]
-set_full_text(find_text(s, '≈48%'), '≈27%')
-set_full_text(find_text(s, 'валовая маржа ОМУ ($217/т)'), 'валовая маржа ОМУ ($120/т)')
+set_full_text(find_text(s, '≈48%'), '≈34%')
+set_full_text(find_text(s, 'валовая маржа ОМУ ($217/т)'), 'валовая маржа ОМУ ($170/т)')
+set_full_text(find_text(s, 'до $34 млн/год'), 'до $38 млн/год')
+sub_text(s, '$450', '$500')                             # revenue KPI + tie-strip + source
+sub_text(s, '29%', '21%')                                # thesis bullet
 set_full_text(find_text(s, 'Локальная себестоимость ($233/т)  защищают маржу от волатильности мировых цен.'),
               'Локальная себестоимость ($330/т) защищает маржу от волатильности мировых цен.')
 
