@@ -83,10 +83,19 @@ def classify(x):
         return ('OTHER_IN','Прочие поступления')
     return ('OPEX','Прочие услуги и расходы')
 
+def service_line(x):
+    """Split operating revenue & COGS into Аренда vs ТЭО."""
+    if x['flow'] not in ('REVENUE','COGS'): return ''
+    p=x['purpose'].lower()
+    if ('аренд' in p or 'субаренд' in p or 'лизинг' in p) and 'офис' not in p:
+        return 'Аренда'
+    return 'ТЭО'
+
 for x in rows:
     ft,cat=classify(x)
     x['flow']=ft; x['cat']=cat
     x['amount']= x['credit'] if x['credit']>0 else -x['debit']
+    x['line']=service_line(x)
 json.dump(rows, open('/home/user/board-presentation/mgmt-report/ledger_classified.json','w'), ensure_ascii=False, indent=1)
 
 agg=collections.defaultdict(lambda:[0,0.0,0.0])
