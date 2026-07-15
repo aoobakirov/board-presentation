@@ -12,7 +12,16 @@ PERIOD="15.06.2026 – 15.07.2026"; ENTITY='ТОО «WayStar Group» (БИН 240
 def norm(n):
     n=re.sub(r'^(Товарищество с ограниченной ответственностью|Акционерное общество|ТОО|АО|Индивидуальный предприниматель|ИП|Частная компания|Производственный кооператив)\s*','',n,flags=re.I)
     return n.strip(' "«»') or '(без наименования)'
-for x in rows: x['cpn']=norm(x['cp'])
+# canonical counterparty key: by BIN when available, else by case-folded name.
+# Prevents duplicate rows / double counting (Excel SUMIFS is case-insensitive).
+def ckey(x):
+    b=str(x.get('bin','')).strip()
+    if re.fullmatch(r'\d{12}', b) and b!='240340014287': return 'BIN:'+b
+    return 'N:'+re.sub(r'\s+',' ',norm(x['cp'])).casefold()
+_variants=collections.defaultdict(collections.Counter)
+for x in rows: _variants[ckey(x)][norm(x['cp'])]+=1
+_display={k:sorted(c.items(),key=lambda kv:(-kv[1],len(kv[0])))[0][0] for k,c in _variants.items()}
+for x in rows: x['cpn']=_display[ckey(x)]
 
 # client & category lists (order only; values via formulas)
 rev_by=collections.defaultdict(float)
@@ -332,8 +341,126 @@ for name in suppliers:
     cell(ws,r,2,f"={sifs(DB,(NM,f'$A{r}'),(FL,q('COGS')))[1:]}+{sifs(DB,(NM,f'$A{r}'),(FL,q('OPEX')))[1:]}",align='right',fmt=NUM)
 ws.column_dimensions['A'].width=54; ws.column_dimensions['B'].width=18
 
-# order: Резюме first
-wb.move_sheet("Резюме", -(wb.sheetnames.index("Резюме")))
+# ============================================================
+# 7. АНАЛИТИКА + ГРАФИКИ
+# ============================================================
+from openpyxl.chart import BarChart, DoughnutChart, Reference
+from openpyxl.chart.label import DataLabelList
+def SP(val,**c):
+    return sum((x['credit'] if val=='credit' else x['debit']) for x in rows if all(x.get(k)==v for k,v in c.items()))
+_rev=SP('credit',flow='REVENUE'); _cogs=SP('debit',flow='COGS'); _opex=SP('debit',flow='OPEX')
+_tax=SP('debit',flow='TAX'); _fc=SP('debit',flow='FIN_COST'); _fi=SP('credit',flow='FIN_INCOME')+SP('credit',flow='FIN_COST')
+_gross=_rev-SP('debit',flow='CONTRA')-_cogs; _ebitda=_gross-_opex; _net=_ebitda-_tax+_fi-_fc
+_top=sorted(((k,v) for k,v in rev_by.items()),key=lambda kv:-kv[1])[:10]
+_arev=SP('credit',flow='REVENUE',line='Аренда'); _trev=SP('credit',flow='REVENUE',line='ТЭО')
+_cogs_rail=sum(x['debit'] for x in rows if x['cat']=='Ж/д тариф, вагоны, услуги перевозчиков')
+_cogs_rep=sum(x['debit'] for x in rows if x['cat']=='Ремонт и ТО вагонов')
+_salary=sum(x['debit'] for x in rows if x['cat']=='Оплата труда')
+_opex_oth=_opex-_salary
+M=1_000_000.0
+
+# --- hidden chart-data sheet (static, so charts always render) ---
+cd=wb.create_sheet("Данные графиков"); cd.sheet_state='hidden'
+cd["A1"]="Топ-10 клиентов"; cd["B1"]="Выручка, млн ₸"
+for i,(nm,v) in enumerate(_top): cd.cell(2+i,1,nm[:28]); cd.cell(2+i,2,round(v/M,1))
+r0=14
+cd.cell(r0,1,"Сегмент"); cd.cell(r0,2,"Выручка, млн ₸")
+cd.cell(r0+1,1,"Аренда"); cd.cell(r0+1,2,round(_arev/M,1))
+cd.cell(r0+2,1,"ТЭО"); cd.cell(r0+2,2,round(_trev/M,1))
+r1=18
+wf=[("Выручка",_rev),("Себестоимость",-_cogs),("Валовая прибыль",_gross),("Опер. расходы",-_opex),
+    ("EBITDA",_ebitda),("Налоги и фин. (нетто)",-(_tax-_fi+_fc)),("Чистая прибыль",_net)]
+cd.cell(r1,1,"P&L"); cd.cell(r1,2,"млн ₸")
+for i,(nm,v) in enumerate(wf): cd.cell(r1+1+i,1,nm); cd.cell(r1+1+i,2,round(v/M,1))
+r2=28
+cs=[("Ж/д тариф, вагоны, перевозчики",_cogs_rail),("Ремонт вагонов",_cogs_rep),
+    ("Оплата труда",_salary),("Прочие опер. расходы",_opex_oth),
+    ("Налоги",_tax),("Проценты по кредитам",_fc)]
+cd.cell(r2,1,"Статья"); cd.cell(r2,2,"млн ₸")
+for i,(nm,v) in enumerate(cs): cd.cell(r2+1+i,1,nm); cd.cell(r2+1+i,2,round(v/M,1))
+r3=37
+tre=SP('credit',flow='TREASURY')-SP('debit',flow='TREASURY')
+fina=SP('credit',flow='FINANCING')-SP('debit',flow='FINANCING')
+intr=SP('credit',flow='INTERNAL')-SP('debit',flow='INTERNAL')
+cf=[("Операционная",_net),("Инвест./казнач.",tre),("Финансовая",fina),("Внутр. переводы",intr)]
+cd.cell(r3,1,"Деятельность"); cd.cell(r3,2,"Чистый поток, млн ₸")
+for i,(nm,v) in enumerate(cf): cd.cell(r3+1+i,1,nm); cd.cell(r3+1+i,2,round(v/M,1))
+
+# --- Аналитика sheet ---
+an=wb.create_sheet("Аналитика"); an.sheet_view.showGridLines=False
+cell(an,1,1,"ФИНАНСОВАЯ АНАЛИТИКА",bold=True,size=16,fontcolor=NAVY,bd=False)
+cell(an,2,1,f"{ENTITY}  ·  {PERIOD}",size=10,italic=True,bd=False)
+PLB=lambda k:f"{PLQ}!B{addr[k]}"
+lcr=4+len(clients)   # last client row on Выручка sheet
+vtot=5+len(clients)  # total row on Выручка sheet
+VYE=f"'Выручка по клиентам'!$E$5:$E${lcr}"; VYT=f"'Выручка по клиентам'!$E${vtot}"
+PCT_TOT=5+len(clients)+1  # ИТОГО row on P&L по клиентам
+PCLQ="'P&L по клиентам'"
+r=4; banner(an,r,4,"КОЭФФИЦИЕНТЫ РЕНТАБЕЛЬНОСТИ")
+def metric(label,formula,fmt=PCT,col=NAVY,hint=""):
+    global r; r+=1
+    cell(an,r,1,label,size=10,bold=True)
+    cell(an,r,2,formula,align='right',fmt=fmt,fontcolor=col,bold=True,size=11)
+    cell(an,r,3,hint,size=9,italic=True,fontcolor="777777"); cell(an,r,4,"")
+metric("Валовая маржа", f"=IFERROR({PLB('gross')}/{PLB('netrev')},0)", hint="валовая прибыль / выручка")
+metric("EBITDA-маржа", f"=IFERROR({PLB('ebitda')}/{PLB('netrev')},0)", hint="EBITDA / выручка")
+metric("Чистая маржа", f"=IFERROR({PLB('net')}/{PLB('netrev')},0)", hint="чистая прибыль / выручка")
+r+=1; banner(an,r,4,"РИСК КОНЦЕНТРАЦИИ КЛИЕНТОВ")
+metric("Число клиентов", f"=COUNT({VYE})", fmt='0', hint="активных за период")
+metric("Доля крупнейшего клиента", f"=IFERROR(LARGE({VYE},1)/{VYT},0)", col=RED, hint="QAZAQ-ASTYQ GROUP")
+metric("Доля топ-3 клиентов", f"=IFERROR((LARGE({VYE},1)+LARGE({VYE},2)+LARGE({VYE},3))/{VYT},0)", col=RED)
+metric("Доля топ-5 клиентов", f"=IFERROR((LARGE({VYE},1)+LARGE({VYE},2)+LARGE({VYE},3)+LARGE({VYE},4)+LARGE({VYE},5))/{VYT},0)", col=RED)
+metric("Индекс Херфиндаля (HHI)", f"=IFERROR(SUMPRODUCT(({VYE}/{VYT})^2)*10000,0)", fmt='#,##0', col=RED, hint=">2500 — высокая концентрация")
+r+=1; banner(an,r,4,"РЕНТАБЕЛЬНОСТЬ СЕГМЕНТОВ (валовая маржа)")
+metric("Аренда (сдача вагонов/цистерн)", f"=IFERROR(({PCLQ}!B{PCT_TOT}-{PCLQ}!E{PCT_TOT})/{PCLQ}!B{PCT_TOT},0)", hint="ниже — капиталоёмкий сегмент")
+metric("ТЭО (экспедирование, ж/д тариф)", f"=IFERROR(({PCLQ}!C{PCT_TOT}-{PCLQ}!F{PCT_TOT})/{PCLQ}!C{PCT_TOT},0)", col=GREEN, hint="ядро прибыли")
+r+=2
+cell(an,r,1,"ВЫВОДЫ И РИСКИ",bold=True,fill=NAVY,fontcolor="FFFFFF",size=11)
+for c in (2,3,4): cell(an,r,c,"",fill=NAVY)
+insights=[
+ "• Высокая рентабельность: EBITDA-маржа ~46%, чистая маржа ~42% за период — бизнес генерирует сильный операционный денежный поток.",
+ "• Критический риск концентрации: 1 клиент (QAZAQ-ASTYQ) даёт ~62% выручки, топ-5 — ~91% (HHI 4341). Потеря ключевого клиента резко ударит по выручке.",
+ "• Сегмент ТЭО (маржа ~54%) кратно прибыльнее Аренды (~22%) — приоритет развития экспедирования; аренда парка капиталоёмка.",
+ "• Казначейство: через депозиты прокручено ~2,37 млрд ₸ (нетто +23 млн — доход по %); куплено валюты на 258 млн ₸ (вероятно, под транзитный тариф).",
+ "• Долговая нагрузка: за период получено займов 189 млн, погашено/выдано 120 млн (нетто +69 млн); проценты и пени 32 млн ₸.",
+ "• ~100 млн ₸ выведено на прочий счёт компании (КЛС) — выписка не предоставлена; рекомендуется включить для полноты картины.",
+ "• Отчётность кассовая: не отражает дебиторку/кредиторку и начисления. Для точной маржи по клиентам нужна привязка затрат (договоры/ЭСФ/рейсы).",
+]
+for t in insights:
+    r+=1; cell(an,r,1,t,size=10,wrap=True,bd=False); an.merge_cells(start_row=r,start_column=1,end_row=r,end_column=4); an.row_dimensions[r].height=30
+an.column_dimensions['A'].width=42; an.column_dimensions['B'].width=16; an.column_dimensions['C'].width=30; an.column_dimensions['D'].width=6
+
+# --- charts ---
+def style_chart(ch,title,w=13,h=7.5):
+    ch.title=title; ch.width=w; ch.height=h; ch.style=2
+def add_bar(anchor,title,minr,maxr,horizontal=False,color="2F6690"):
+    ch=BarChart(); ch.type="bar" if horizontal else "col"; ch.legend=None
+    style_chart(ch,title)
+    d=Reference(cd,min_col=2,min_row=minr,max_row=maxr)
+    c=Reference(cd,min_col=1,min_row=minr,max_row=maxr)
+    ch.add_data(d,titles_from_data=False); ch.set_categories(c)
+    ch.dataLabels=DataLabelList(); ch.dataLabels.showVal=True
+    ch.series[0].graphicalProperties.solidFill=color
+    an.add_chart(ch,anchor)
+# 1. Top-10 clients
+add_bar("F4","Топ-10 клиентов по выручке, млн ₸",2,11,horizontal=True,color="13294B")
+# 2. Segment doughnut
+dch=DoughnutChart(); style_chart(dch,"Структура выручки: Аренда vs ТЭО")
+dd=Reference(cd,min_col=2,min_row=r0+1,max_row=r0+2); dc=Reference(cd,min_col=1,min_row=r0+1,max_row=r0+2)
+dch.add_data(dd,titles_from_data=False); dch.set_categories(dc)
+dch.dataLabels=DataLabelList(); dch.dataLabels.showPercent=True
+an.add_chart(dch,"F20")
+# 3. P&L waterfall (col)
+add_bar("F36","Каскад P&L, млн ₸",r1+1,r1+7,color="2F6690")
+# 4. Cost structure (bar horizontal)
+add_bar("N4","Структура расходов, млн ₸",r2+1,r2+6,horizontal=True,color="C4772F")
+# 5. Cash flow by activity (col)
+add_bar("N20","Денежный поток по видам деятельности, млн ₸",r3+1,r3+4,color="1E7A3D")
+
+# explicit sheet order
+desired=["Резюме","Аналитика","P&L (кассовый)","P&L по клиентам","ДДС (Cash Flow)",
+         "Выручка по клиентам","Расходы","Реестр операций","Данные графиков"]
+wb._sheets.sort(key=lambda s: desired.index(s.title))
 wb.active=0
 out='/home/user/board-presentation/mgmt-report/WayStar_Управленческая_отчетность_15.06-15.07.2026.xlsx'
 wb.save(out)
