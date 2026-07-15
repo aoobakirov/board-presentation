@@ -6,7 +6,7 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 rows=json.load(open('/home/user/board-presentation/mgmt-report/ledger_classified.json'))
-BAL={'БЦК':(75346.24,110840346.22),'Halyk':(222587.02,2526900.00),'RBK':(0.0,44256.05)}
+BAL={'БЦК':(75346.24,110840346.22),'Halyk':(222587.02,2526900.00),'RBK':(0.0,44256.05),'БЦК·USD':(0.0,0.0)}
 PERIOD="15.06.2026 – 15.07.2026"; ENTITY='ТОО «WayStar Group» (БИН 240340014287)'
 
 def norm(n):
@@ -63,7 +63,7 @@ wb=Workbook()
 reg=wb.active; reg.title="Реестр операций"; reg.sheet_view.showGridLines=False
 cell(reg,1,1,"РЕЕСТР ОПЕРАЦИЙ (классифицированный) — источник данных для формул",bold=True,size=12,fontcolor=NAVY,bd=False)
 HROW=3
-for c,t in enumerate(["Банк","Дата","Контрагент","Контрагент (норм.)","БИН","Поступление","Выплата","КНП","Тип","Категория","Направление","Назначение платежа"],1):
+for c,t in enumerate(["Банк","Дата","Контрагент","Контрагент (норм.)","БИН","Поступление, ₸","Выплата, ₸","КНП","Тип","Категория","Направление","Назначение платежа","Валюта","Сумма в валюте"],1):
     hdr(reg,HROW,c,t)
 data=sorted(rows,key=lambda x:(x['date'][6:10]+x['date'][3:5]+x['date'][0:2], x['bank']))
 r=HROW
@@ -76,9 +76,11 @@ for x in data:
     cell(reg,r,8,x['knp'],size=9,align='center'); cell(reg,r,9,x['flow'],size=9)
     cell(reg,r,10,x['cat'],size=9); cell(reg,r,11,x['line'],size=9,align='center')
     cell(reg,r,12,x['purpose'][:90],size=9)
+    cell(reg,r,13,x.get('ccy','KZT'),size=9,align='center')
+    cell(reg,r,14,(x.get('ccy_amt') if x.get('ccy')=='USD' else None),size=9,align='right',fmt='#,##0.00')
 LAST=r
-for i,w in enumerate([8,11,32,30,14,14,14,7,11,30,12,55],1): reg.column_dimensions[get_column_letter(i)].width=w
-reg.freeze_panes="A4"; reg.auto_filter.ref=f"A{HROW}:L{LAST}"
+for i,w in enumerate([9,11,32,30,14,15,15,7,11,30,12,55,8,14],1): reg.column_dimensions[get_column_letter(i)].width=w
+reg.freeze_panes="A4"; reg.auto_filter.ref=f"A{HROW}:N{LAST}"
 
 # SUMIFS reference ranges (full columns)
 R="'Реестр операций'"
@@ -182,7 +184,7 @@ ws.freeze_panes="B6"
 ws=wb.create_sheet("Резюме"); ws.sheet_view.showGridLines=False
 cell(ws,1,1,"УПРАВЛЕНЧЕСКАЯ ОТЧЁТНОСТЬ",bold=True,size=16,fontcolor=NAVY,bd=False)
 cell(ws,2,1,ENTITY,size=11,fontcolor=BLUE,bd=False)
-cell(ws,3,1,f"Период: {PERIOD}  ·  выписки 3 банков (БЦК, Halyk, Bank RBK)  ·  валюта: KZT",size=10,italic=True,bd=False)
+cell(ws,3,1,f"Период: {PERIOD}  ·  выписки 3 банков / 4 счёта (БЦК ₸+$, Halyk, Bank RBK)  ·  консолидация в ₸",size=10,italic=True,bd=False)
 cell(ws,4,1,"Метод: кассовый (по фактическому движению денег). Все показатели — формулы.",size=9,italic=True,fontcolor="777777",bd=False)
 r=6; banner(ws,r,4,"КЛЮЧЕВЫЕ ПОКАЗАТЕЛИ (₸)")
 def kpi(label,formula,big=False,col="1A1A1A",pct=False):
@@ -211,9 +213,9 @@ def cfl(label,formula,tot=False):
     cell(ws,r,4,formula,bold=tot,align='right',fmt=NUM,fill=LGREY if tot else None,fontcolor=(GREEN if tot else "1A1A1A"))
 cfl("Денежные средства на начало периода", f"={open_bal}", tot=True)
 cfl("Операционный денежный поток", f"={P('net')}")
-cfl("Инвестиц./казначейские (депозиты, валюта)", f"={sifs(CR,(FL,q('TREASURY')))[1:]}-{sifs(DB,(FL,q('TREASURY')))[1:]}")
+cfl("Казначейские (депозиты)", f"={sifs(CR,(FL,q('TREASURY')))[1:]}-{sifs(DB,(FL,q('TREASURY')))[1:]}")
 cfl("Финансовые потоки (займы, кредиты)", f"={sifs(CR,(FL,q('FINANCING')))[1:]}-{sifs(DB,(FL,q('FINANCING')))[1:]}")
-cfl("Переводы на прочие счета компании (КЛС и пр.)", f"={sifs(CR,(FL,q('INTERNAL')))[1:]}-{sifs(DB,(FL,q('INTERNAL')))[1:]}")
+cfl("Переводы между счетами и конвертация валюты", f"={sifs(CR,(FL,q('INTERNAL')))[1:]}-{sifs(DB,(FL,q('INTERNAL')))[1:]}")
 cfl("Прочее", f"={sifs(CR,(FL,q('OTHER_IN')))[1:]}")
 cfl("Денежные средства на конец периода", f"={close_bal}", tot=True)
 ws.column_dimensions['A'].width=48
@@ -255,20 +257,20 @@ cell(ws,osum,4,f"=SUM(D{o1}:D{o7})",bold=True,align='right',fmt=NUM,fill=LGREY,f
 r+=1; banner(ws,r,4,"ИНВЕСТИЦИОННАЯ / КАЗНАЧЕЙСКАЯ ДЕЯТЕЛЬНОСТЬ",fill=BLUE)
 i1=cf2("Снятие / возврат депозитов", sifs(CR,(CT,q("Снятие/возврат депозита"))), None)
 i2=cf2("Размещение депозитов", None, sifs(DB,(CT,q("Размещение депозита"))))
-i3=cf2("Покупка иностранной валюты (FX)", None, sifs(DB,(CT,q("Покупка валюты (FX)"))))
 isum=cf2("Итого по инвестиц./казнач. деятельности", None, None, bold=True)
-cell(ws,isum,4,f"=SUM(D{i1}:D{i3})",bold=True,align='right',fmt=NUM,fill=LGREY)
+cell(ws,isum,4,f"=SUM(D{i1}:D{i2})",bold=True,align='right',fmt=NUM,fill=LGREY)
 r+=1; banner(ws,r,4,"ФИНАНСОВАЯ ДЕЯТЕЛЬНОСТЬ",fill=BLUE)
 f1=cf2("Займы полученные / возврат выданных займов", sifs(CR,(FL,q("FINANCING"))), None)
 f2=cf2("Погашение и выдача займов", None, sifs(DB,(FL,q("FINANCING"))))
 fsum=cf2("Итого по финансовой деятельности", None, None, bold=True)
 cell(ws,fsum,4,f"=SUM(D{f1}:D{f2})",bold=True,align='right',fmt=NUM,fill=LGREY)
-r+=1; banner(ws,r,4,"ВНУТРЕННИЕ ПЕРЕВОДЫ И ПРОЧЕЕ",fill=BLUE)
-n1=cf2("Переводы между собственными счетами (в т.ч. КЛС)", sifs(CR,(FL,q("INTERNAL"))), sifs(DB,(FL,q("INTERNAL"))))
+r+=1; banner(ws,r,4,"ВНУТРЕННИЕ ПЕРЕВОДЫ И КОНВЕРТАЦИЯ",fill=BLUE)
+n1=cf2("Переводы между собственными счетами (в т.ч. КЛС)", sifs(CR,(CT,q("Переводы между своими счетами"))), sifs(DB,(CT,q("Переводы между своими счетами"))))
+n3=cf2("Конвертация валюты (KZT↔USD, транзитный счёт)", sifs(CR,(CT,q("Конвертация валюты (KZT↔USD)"))), sifs(DB,(CT,q("Конвертация валюты (KZT↔USD)"))))
 n2=cf2("Прочие поступления", sifs(CR,(FL,q("OTHER_IN"))), None)
 r+=1; banner(ws,r,4,"ЧИСТОЕ ИЗМЕНЕНИЕ ДЕНЕЖНЫХ СРЕДСТВ")
 chg=r
-cell(ws,r,4,f"=D{osum}+D{isum}+D{fsum}+D{n1}+D{n2}",bold=True,align='right',fmt=NUM,fill=NAVY,fontcolor="FFFFFF")
+cell(ws,r,4,f"=D{osum}+D{isum}+D{fsum}+D{n1}+D{n3}+D{n2}",bold=True,align='right',fmt=NUM,fill=NAVY,fontcolor="FFFFFF")
 endrow=cf2("Остаток денежных средств на конец периода", None, None, bold=True)
 cell(ws,endrow,4,f"=D5+D{chg}",bold=True,align='right',fmt=NUM,fill=LGREY,fontcolor=GREEN)  # D5 = opening
 cell(ws,endrow,2,f"={sum(v[1] for v in BAL.values())}",bold=True,align='right',fmt=NUM,fill=LGREY)
@@ -276,12 +278,12 @@ r=endrow+2
 cell(ws,r,1,"Сверка по банковским счетам (контроль):",bold=True,size=10,bd=False); r+=1
 for c,t in [(1,"Банк / счёт"),(2,"Остаток на начало"),(3,"Остаток на конец")]: hdr(ws,r,c,t)
 cell(ws,r,4,"",fill=NAVY)
-names={'БЦК':'АО «Банк ЦентрКредит»','Halyk':'АО «Народный Банк»','RBK':'АО «Bank RBK»'}
+names={'БЦК':'АО «Банк ЦентрКредит» (KZT)','Halyk':'АО «Народный Банк»','RBK':'АО «Bank RBK»','БЦК·USD':'АО «Банк ЦентрКредит» (USD, транзитный)'}
 b0=r
 for b,(o,cl) in BAL.items():
     r+=1; cell(ws,r,1,names[b],size=10); cell(ws,r,2,o,align='right',fmt=NUM); cell(ws,r,3,cl,align='right',fmt=NUM); cell(ws,r,4,"")
 r+=1
-cell(ws,r,1,"ИТОГО по 3 счетам",bold=True,fill=LGREY)
+cell(ws,r,1,"ИТОГО по 4 счетам",bold=True,fill=LGREY)
 cell(ws,r,2,f"=SUM(B{b0+1}:B{r-1})",bold=True,align='right',fmt=NUM,fill=LGREY)
 cell(ws,r,3,f"=SUM(C{b0+1}:C{r-1})",bold=True,align='right',fmt=NUM,fill=LGREY); cell(ws,r,4,"",fill=LGREY)
 ws.column_dimensions['A'].width=54
@@ -354,6 +356,7 @@ _gross=_rev-SP('debit',flow='CONTRA')-_cogs; _ebitda=_gross-_opex; _net=_ebitda-
 _top=sorted(((k,v) for k,v in rev_by.items()),key=lambda kv:-kv[1])[:10]
 _arev=SP('credit',flow='REVENUE',line='Аренда'); _trev=SP('credit',flow='REVENUE',line='ТЭО')
 _cogs_rail=sum(x['debit'] for x in rows if x['cat']=='Ж/д тариф, вагоны, услуги перевозчиков')
+_cogs_foreign=sum(x['debit'] for x in rows if x['cat']=='Иностранный транспорт/транзит (валюта)')
 _cogs_rep=sum(x['debit'] for x in rows if x['cat']=='Ремонт и ТО вагонов')
 _salary=sum(x['debit'] for x in rows if x['cat']=='Оплата труда')
 _opex_oth=_opex-_salary
@@ -373,12 +376,12 @@ wf=[("Выручка",_rev),("Себестоимость",-_cogs),("Валова
 cd.cell(r1,1,"P&L"); cd.cell(r1,2,"млн ₸")
 for i,(nm,v) in enumerate(wf): cd.cell(r1+1+i,1,nm); cd.cell(r1+1+i,2,round(v/M,1))
 r2=28
-cs=[("Ж/д тариф, вагоны, перевозчики",_cogs_rail),("Ремонт вагонов",_cogs_rep),
-    ("Оплата труда",_salary),("Прочие опер. расходы",_opex_oth),
+cs=[("Ж/д тариф, вагоны, перевозчики (РК)",_cogs_rail),("Иностранный транзит (USD)",_cogs_foreign),
+    ("Ремонт вагонов",_cogs_rep),("Оплата труда",_salary),("Прочие опер. расходы",_opex_oth),
     ("Налоги",_tax),("Проценты по кредитам",_fc)]
 cd.cell(r2,1,"Статья"); cd.cell(r2,2,"млн ₸")
 for i,(nm,v) in enumerate(cs): cd.cell(r2+1+i,1,nm); cd.cell(r2+1+i,2,round(v/M,1))
-r3=37
+r3=38
 tre=SP('credit',flow='TREASURY')-SP('debit',flow='TREASURY')
 fina=SP('credit',flow='FINANCING')-SP('debit',flow='FINANCING')
 intr=SP('credit',flow='INTERNAL')-SP('debit',flow='INTERNAL')
@@ -418,12 +421,13 @@ r+=2
 cell(an,r,1,"ВЫВОДЫ И РИСКИ",bold=True,fill=NAVY,fontcolor="FFFFFF",size=11)
 for c in (2,3,4): cell(an,r,c,"",fill=NAVY)
 insights=[
- "• Высокая рентабельность: EBITDA-маржа ~46%, чистая маржа ~42% за период — бизнес генерирует сильный операционный денежный поток.",
+ "• Рентабельность (с учётом валютного счёта): валовая маржа ~29%, EBITDA-маржа ~24%, чистая ~20%. Бизнес прибыльный, но маржа умереннее, чем кажется по тенговым счетам.",
+ "• ВАЖНО: иностранный транзит через USD-счёт — 202 млн ₸ ($426 тыс.: MEGA STOCK, Таиланд; Altyn Trans, Узбекистан) — это реальная себестоимость. Ранее она была видна лишь как «покупка валюты» и не попадала в P&L, завышая валовую маржу до 51%.",
  "• Критический риск концентрации: 1 клиент (QAZAQ-ASTYQ) даёт ~62% выручки, топ-5 — ~91% (HHI 4341). Потеря ключевого клиента резко ударит по выручке.",
- "• Сегмент ТЭО (маржа ~54%) кратно прибыльнее Аренды (~22%) — приоритет развития экспедирования; аренда парка капиталоёмка.",
- "• Казначейство: через депозиты прокручено ~2,37 млрд ₸ (нетто +23 млн — доход по %); куплено валюты на 258 млн ₸ (вероятно, под транзитный тариф).",
+ "• Сегмент ТЭО (маржа ~30%) прибыльнее Аренды (~22%); иностранный транзит существенно снижает маржу экспедирования — стоит пересмотреть ценообразование на международных маршрутах.",
+ "• Казначейство: через депозиты прокручено ~2,37 млрд ₸ (нетто +23 млн — доход по %). USD-счёт транзитный (открытие/закрытие 0): валюта покупается и сразу уходит перевозчикам.",
  "• Долговая нагрузка: за период получено займов 189 млн, погашено/выдано 120 млн (нетто +69 млн); проценты и пени 32 млн ₸.",
- "• ~100 млн ₸ выведено на прочий счёт компании (КЛС) — выписка не предоставлена; рекомендуется включить для полноты картины.",
+ "• ~100 млн ₸ выведено на прочий счёт компании (КЛС); ~56 млн ₸ конвертации ушло на др. валютный счёт — выписки не предоставлены, рекомендуется включить для полноты.",
  "• Отчётность кассовая: не отражает дебиторку/кредиторку и начисления. Для точной маржи по клиентам нужна привязка затрат (договоры/ЭСФ/рейсы).",
 ]
 for t in insights:
@@ -453,7 +457,7 @@ an.add_chart(dch,"F20")
 # 3. P&L waterfall (col)
 add_bar("F36","Каскад P&L, млн ₸",r1+1,r1+7,color="2F6690")
 # 4. Cost structure (bar horizontal)
-add_bar("N4","Структура расходов, млн ₸",r2+1,r2+6,horizontal=True,color="C4772F")
+add_bar("N4","Структура расходов, млн ₸",r2+1,r2+7,horizontal=True,color="C4772F")
 # 5. Cash flow by activity (col)
 add_bar("N20","Денежный поток по видам деятельности, млн ₸",r3+1,r3+4,color="1E7A3D")
 

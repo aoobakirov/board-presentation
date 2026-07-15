@@ -6,6 +6,7 @@ UP='/root/.claude/uploads/8c625b59-905c-5bbf-a364-1efacfc0757a/'
 F1=UP+'5ea86348-__________________15.06.202615.07.2026.xls'   # БЦК
 F2=UP+'91e90539-____________________15.06.202615.07.2026.xls' # Halyk
 F3=UP+'fdba00ea-__________________15.06.202615.07.2026.xlsx'  # RBK
+F4=UP+'af86a6f6-_________________________________.xls'         # БЦК USD-счёт
 
 def num(s):
     if s is None: return 0.0
@@ -76,10 +77,33 @@ for r in range(20, sh.max_row+1):
         debit=debit, credit=credit, knp='',
         purpose=str(v[7] or '').strip()))
 
+# existing rows are KZT
+for x in rows: x['ccy']='KZT'; x['ccy_amt']=(x['credit'] or x['debit'])
+
+# ---- FILE 4: БЦК USD-счёт (транзитный) ----
+# Same layout as F1. Amounts in USD; col 12 = KZT equivalent ("Сумма конвертаций").
+wb=xlrd.open_workbook(F4); sh=wb.sheet_by_index(0)
+for r in range(9, sh.nrows):
+    v=[sh.cell_value(r,c) for c in range(sh.ncols)]
+    if not str(v[0]).strip(): continue
+    if re.match(r'(Жиынтығы|Итого|Шығыс|Исходящее)', str(v[5] if len(v)>5 else '').strip()): continue
+    usd_d=num(v[7]); usd_c=num(v[8])
+    if usd_d==0 and usd_c==0: continue
+    kzt=num(v[12])  # KZT equivalent from bank
+    rows.append(dict(bank='БЦК·USD', date=d10(v[1]), doc=str(v[0]),
+        cp=str(v[5]).strip(), bin=str(v[4] if usd_c>0 else v[6]).strip(),
+        cp_bin=str(v[4]).strip(),
+        # store report amounts in KZT so all SUMIFS work in one currency
+        debit=(kzt if usd_d>0 else 0.0), credit=(kzt if usd_c>0 else 0.0),
+        knp=str(v[9]).strip(), purpose=str(v[11]).strip(),
+        ccy='USD', ccy_amt=(usd_d or usd_c)))
+
 json.dump(rows, open('/home/user/board-presentation/mgmt-report/ledger.json','w'), ensure_ascii=False, indent=1)
 tot_in=sum(x['credit'] for x in rows); tot_out=sum(x['debit'] for x in rows)
 print("Total records:", len(rows))
-for b in ['БЦК','Halyk','RBK']:
+for b in ['БЦК','Halyk','RBK','БЦК·USD']:
     rr=[x for x in rows if x['bank']==b]
     print(f"  {b}: {len(rr)} tx | in(credit)={sum(x['credit'] for x in rr):,.0f} | out(debit)={sum(x['debit'] for x in rr):,.0f}")
 print(f"TOTAL inflow={tot_in:,.0f}  outflow={tot_out:,.0f}  net={tot_in-tot_out:,.0f}")
+usd=[x for x in rows if x['ccy']=='USD']
+print(f"USD-счёт: {len(usd)} операций, ${sum(x['ccy_amt'] for x in usd if x['debit']>0):,.0f} выплат иностр. поставщикам = {sum(x['debit'] for x in usd):,.0f} ₸")

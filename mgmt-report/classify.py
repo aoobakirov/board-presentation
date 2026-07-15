@@ -16,6 +16,13 @@ def classify(x):
     own = ('waystar' in cp) or (x.get('bin')==WAY) or (x.get('cp_bin')==WAY)
     state = any(s in cp for s in ('государственная корпорация','кгд','угд','дгд','комитет государственных доходов','налоговый комитет'))
 
+    # 0. USD (валютный) транзитный счёт
+    if x.get('ccy')=='USD':
+        if inflow:   # покупка валюты (зачисление на валютный счёт) — внутренняя конвертация
+            return ('INTERNAL','Конвертация валюты (KZT↔USD)')
+        # выплата иностранному перевозчику/экспедитору = себестоимость (транзит за рубежом)
+        return ('COGS','Иностранный транспорт/транзит (валюта)')
+
     # 1. STATE / TAX (counterparty is a budget/social body)
     if state or knp in ('911','912','010','011','012','121','122','089','101','102'):
         return ('TAX','Налоги и социальные платежи')
@@ -28,9 +35,9 @@ def classify(x):
         return ('TREASURY','Размещение депозита')
     if knp in ('321','322') or 'снятие с' in p or 'выплата вклада' in p or 'частичная выплата вклада' in p:
         return ('TREASURY','Снятие/возврат депозита')
-    # 4. TREASURY: FX
+    # 4. FX purchase from KZT account = conversion into own USD account (internal)
     if knp=='213' or 'покупка иностранной валюты' in p:
-        return ('TREASURY','Покупка валюты (FX)')
+        return ('INTERNAL','Конвертация валюты (KZT↔USD)')
     # 5. Deposit interest income
     if knp=='316' or ('вознаграждени' in p and ('вклад' in p or 'депозит' in p)):
         return ('FIN_INCOME','% по депозиту')
