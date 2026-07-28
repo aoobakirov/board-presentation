@@ -3,3 +3,7 @@ work/
 lo_profile/
 __pycache__/
 *.log
+node_modules/
+marketing-modern/preview.html
+marketing-modern/full.png
+marketing-modern/shots/
