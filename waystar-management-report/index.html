@@ -1,0 +1,533 @@
+<meta charset="utf-8">
+<title>WayStar Group — Управленческий отчёт · Июль 2026</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#eef1f5; --panel:#ffffff; --panel-2:#f6f8fb;
+  --ink:#0d1620; --ink-2:#47566a; --muted:#8492a6; --hair:#e3e8ef; --baseline:#c8d1de;
+  --accent:#1f5fb0; --accent-soft:#e7f0fb;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#4a3aa7; --s7:#e34948; --s8:#008300;
+  --good:#0ca30c; --warn:#e8920c; --serious:#ec835a; --crit:#d03b3b;
+  --good-bg:#e7f6e7; --warn-bg:#fdf1dc; --crit-bg:#fbe6e6;
+  --shadow:0 1px 2px rgba(13,22,32,.06),0 8px 24px rgba(13,22,32,.06);
+}
+@media (prefers-color-scheme:dark){:root:where(:not([data-theme="light"])){
+  color-scheme:dark;
+  --bg:#0b0f14; --panel:#151b23; --panel-2:#1b232d;
+  --ink:#f3f6fa; --ink-2:#b7c2d0; --muted:#7d8a9c; --hair:#252e39; --baseline:#333e4b;
+  --accent:#5aa0ee; --accent-soft:#16283e;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#9085e9; --s7:#e66767; --s8:#12a012;
+  --good:#25b825; --warn:#f0a72a; --serious:#f0956a; --crit:#e05a5a;
+  --good-bg:#132717; --warn-bg:#2c2413; --crit-bg:#2c1717;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0b0f14; --panel:#151b23; --panel-2:#1b232d;
+  --ink:#f3f6fa; --ink-2:#b7c2d0; --muted:#7d8a9c; --hair:#252e39; --baseline:#333e4b;
+  --accent:#5aa0ee; --accent-soft:#16283e;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#9085e9; --s7:#e66767; --s8:#12a012;
+  --good:#25b825; --warn:#f0a72a; --serious:#f0956a; --crit:#e05a5a;
+  --good-bg:#132717; --warn-bg:#2c2413; --crit-bg:#2c1717;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;line-height:1.5;}
+.wrap{max-width:1240px;margin:0 auto;padding:28px 22px 72px;}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* header */
+header.rep{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between;
+  padding-bottom:22px;border-bottom:2px solid var(--ink);margin-bottom:8px;}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:46px;height:46px;border-radius:11px;background:linear-gradient(135deg,var(--s1),var(--s6));
+  display:grid;place-items:center;color:#fff;font-weight:800;font-size:20px;letter-spacing:.5px;box-shadow:var(--shadow)}
+.eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700}
+h1{font-size:26px;margin:2px 0 0;letter-spacing:-.02em;font-weight:800;text-wrap:balance}
+.sub{color:var(--ink-2);font-size:13.5px;margin-top:3px}
+.period{text-align:right}
+.period .p1{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-weight:700}
+.period .p2{font-size:19px;font-weight:800;letter-spacing:-.01em}
+.themebtn{border:1px solid var(--hair);background:var(--panel);color:var(--ink-2);border-radius:9px;
+  padding:7px 11px;font-size:12px;cursor:pointer;font-weight:600}
+
+/* thesis banner */
+.thesis{margin:22px 0 4px;background:var(--panel);border:1px solid var(--hair);border-left:4px solid var(--accent);
+  border-radius:14px;padding:18px 20px;box-shadow:var(--shadow)}
+.thesis .lead{font-size:15px;color:var(--ink);line-height:1.6}
+.thesis b{color:var(--ink)}
+.hl{background:var(--accent-soft);border-radius:5px;padding:1px 6px;font-weight:700;color:var(--accent)}
+
+/* section */
+.sec{margin-top:34px}
+.sec-h{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+.sec-h h2{font-size:16px;margin:0;letter-spacing:.01em;font-weight:800}
+.sec-h .n{font-size:11px;font-weight:800;color:var(--accent);letter-spacing:.1em}
+.sec-h .d{font-size:12.5px;color:var(--muted);margin-left:auto;text-align:right}
+
+/* KPI grid */
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+.kpi{background:var(--panel);border:1px solid var(--hair);border-radius:13px;padding:15px 15px 14px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi .k-lab{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:700;min-height:28px}
+.kpi .k-val{font-size:23px;font-weight:800;letter-spacing:-.02em;margin-top:6px;line-height:1.1}
+.kpi .k-val .u{font-size:12px;font-weight:600;color:var(--ink-2);margin-left:3px}
+.kpi .k-sub{font-size:11.5px;color:var(--ink-2);margin-top:5px}
+.kpi.big{grid-column:span 2}
+.kpi .strip{position:absolute;left:0;top:0;bottom:0;width:3px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
+.chip.g{background:var(--good-bg);color:var(--good)} .chip.w{background:var(--warn-bg);color:var(--warn)} .chip.c{background:var(--crit-bg);color:var(--crit)}
+
+/* cards grid */
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:1fr 1fr}
+.card{background:var(--panel);border:1px solid var(--hair);border-radius:14px;padding:18px 18px 16px;box-shadow:var(--shadow)}
+.card h3{font-size:14.5px;margin:0 0 3px;font-weight:800;letter-spacing:-.01em}
+.card .cap{font-size:12px;color:var(--muted);margin:0 0 14px}
+
+/* horizontal bars */
+.hbar{display:grid;grid-template-columns:1fr;gap:9px}
+.hbar .row{display:grid;grid-template-columns:180px 1fr auto;align-items:center;gap:10px;font-size:12.5px}
+.hbar .nm{color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hbar .tr{background:var(--panel-2);border-radius:5px;height:20px;position:relative;overflow:hidden}
+.hbar .fl{height:100%;border-radius:5px;min-width:2px}
+.hbar .vv{font-weight:700;white-space:nowrap;color:var(--ink)}
+.hbar .pct{font-size:11px;color:var(--muted);font-weight:600;margin-left:6px}
+
+/* decomposition stacked */
+.decomp{margin-top:6px}
+.decomp .track{display:flex;height:38px;border-radius:9px;overflow:hidden;border:1px solid var(--hair)}
+.decomp .seg{display:flex;align-items:center;justify-content:center;color:#fff;font-size:11.5px;font-weight:700;position:relative;min-width:0}
+.decomp .seg span{padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.decomp .lgd{display:flex;flex-wrap:wrap;gap:16px;margin-top:14px;font-size:12px}
+.decomp .lgd .li{display:flex;align-items:center;gap:7px;color:var(--ink-2)}
+.decomp .sw{width:11px;height:11px;border-radius:3px;flex:none}
+.decomp .lgd b{color:var(--ink)}
+
+/* svg charts */
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.axis text{fill:var(--muted);font-size:10.5px}
+.grid-l{stroke:var(--hair);stroke-width:1}
+.baseline{stroke:var(--baseline);stroke-width:1}
+
+/* legend */
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:12px}
+.legend .li{display:flex;align-items:center;gap:7px;color:var(--ink-2)}
+.legend .sw{width:12px;height:12px;border-radius:3px}
+.legend .ln{width:16px;height:3px;border-radius:2px}
+
+/* table */
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{text-align:right;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;padding:0 10px 9px;border-bottom:1px solid var(--hair)}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl td{padding:10px;border-bottom:1px solid var(--hair);color:var(--ink-2)}
+.tbl td.v{text-align:right;font-weight:700;color:var(--ink)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl .bank{font-weight:700;color:var(--ink)}
+.badge{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--panel-2);color:var(--ink-2)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+
+/* findings */
+.finds{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.find{background:var(--panel);border:1px solid var(--hair);border-radius:13px;padding:16px 17px;box-shadow:var(--shadow);border-top:3px solid var(--hair)}
+.find.c{border-top-color:var(--crit)} .find.w{border-top-color:var(--warn)} .find.g{border-top-color:var(--good)} .find.i{border-top-color:var(--s1)}
+.find .ft{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+.find .ico{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-size:12px;font-weight:800;flex:none;color:#fff}
+.find.c .ico{background:var(--crit)} .find.w .ico{background:var(--warn)} .find.g .ico{background:var(--good)} .find.i .ico{background:var(--s1)}
+.find h4{font-size:13.5px;margin:0;font-weight:800}
+.find p{font-size:12.5px;color:var(--ink-2);margin:0;line-height:1.55}
+.find .big{font-weight:800;color:var(--ink)}
+
+/* tooltip */
+#tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);padding:7px 10px;border-radius:8px;
+  font-size:11.5px;line-height:1.45;opacity:0;transition:opacity .1s;z-index:50;box-shadow:0 6px 20px rgba(0,0,0,.3);max-width:260px}
+#tip b{color:#fff}
+:root[data-theme="dark"] #tip,@media(prefers-color-scheme:dark){#tip{background:#e9edf3;color:#0b0f14}#tip b{color:#000}}
+
+.note{margin-top:34px;font-size:11.5px;color:var(--muted);border-top:1px solid var(--hair);padding-top:16px;line-height:1.6}
+.foot{margin-top:10px;font-size:11px;color:var(--muted)}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.kpi.big{grid-column:span 2}.g2{grid-template-columns:1fr}.finds{grid-template-columns:1fr}.hbar .row{grid-template-columns:120px 1fr auto}}
+</style>
+
+<div class="wrap">
+  <header class="rep">
+    <div class="brand">
+      <div class="logo">WS</div>
+      <div>
+        <div class="eyebrow">Управленческая отчётность · по банковским выпискам</div>
+        <h1>WayStar Group</h1>
+        <div class="sub">ТОО · БИН 240340014287 · транспортно-экспедиторские услуги (предоставление ж/д цистерн и вагонов)</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:14px;align-items:center">
+      <div class="period">
+        <div class="p1">Отчётный период</div>
+        <div class="p2">Июль 2026</div>
+      </div>
+      <button class="themebtn" id="themebtn">◐ Тема</button>
+    </div>
+  </header>
+
+  <div class="thesis">
+    <div class="lead">
+      Через 5 счетов компании в 2 банках (ЦентрКредит, Bank RBK) и 3 валютах за месяц прошло
+      <b class="hl" id="t-gross"></b> валового оборота. Но <b>79% этой суммы — «шум»</b>: переводы между
+      собственными счетами и покупка валюты. Реальный денежный поток с внешним миром —
+      <b class="hl" id="t-ext"></b> прихода и <b class="hl" id="t-out"></b> расхода. После себестоимости, ФОТ, аренды и налогов
+      операционная прибыль составила <b class="hl" id="t-margin"></b> (рентабельность <b id="t-mp"></b>).
+      Ниже — что за этим стоит и на что смотреть.
+    </div>
+  </div>
+
+  <!-- KPI -->
+  <div class="sec">
+    <div class="sec-h"><span class="n">01</span><h2>Ключевые показатели</h2>
+      <span class="d">все суммы в тенге (валюта пересчитана по курсу банка: USD 480,72 · RUB 6,14)</span></div>
+    <div class="kpis" id="kpis"></div>
+  </div>
+
+  <!-- Decomposition -->
+  <div class="sec">
+    <div class="sec-h"><span class="n">02</span><h2>Из чего складывается оборот 10,1 млрд ₸</h2>
+      <span class="d">почему «большой оборот» ≠ «большой бизнес»</span></div>
+    <div class="card">
+      <h3>Декомпозиция валового оборота</h3>
+      <p class="cap">Внутренние переводы и конвертация валют раздувают оборот, но не создают экономики. Управленческий взгляд оставляет только внешние потоки.</p>
+      <div class="decomp">
+        <div class="track" id="decomp-track"></div>
+        <div class="lgd" id="decomp-lgd"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Money flow / cascade -->
+  <div class="sec">
+    <div class="sec-h"><span class="n">03</span><h2>Экономика: от выручки к прибыли</h2>
+      <span class="d">управленческий P&amp;L и детальная структура затрат</span></div>
+    <div class="grid g2">
+      <div class="card chart">
+        <h3>P&amp;L-каскад за месяц</h3>
+        <p class="cap">Выручка → себестоимость → валовая прибыль → ФОТ, админ, налоги → операционная прибыль. Финансовые оттоки (кредит, займы) показаны отдельно — это движение денег, а не расход прибыли.</p>
+        <div id="waterfall"></div>
+      </div>
+      <div class="card">
+        <h3>Структура затрат по назначению</h3>
+        <p class="cap">1 044 млн ₸ внешних платежей · сгруппировано по экономическому смыслу (аренда вагонов — себестоимость, а не офис)</p>
+        <div class="legend" id="cost-legend" style="margin:0 0 12px"></div>
+        <div class="hbar" id="cost-bars"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Daily -->
+  <div class="sec">
+    <div class="sec-h"><span class="n">04</span><h2>Динамика денежного потока по дням</h2>
+      <span class="d">внешние приходы и расходы, ₸</span></div>
+    <div class="card chart">
+      <h3>Приток vs Отток по дням</h3>
+      <p class="cap">Пиковые поступления 01, 03 и 28 июля; крупные оттоки 09 и 30 июля. Остатки на счетах к концу месяца обнуляются.</p>
+      <div id="daily-chart"></div>
+      <div class="legend" id="daily-legend"></div>
+    </div>
+  </div>
+
+  <!-- Clients / suppliers -->
+  <div class="sec">
+    <div class="sec-h"><span class="n">05</span><h2>Контрагенты: кто платит и кому платим</h2>
+      <span class="d">операционные потоки, топ-10</span></div>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Крупнейшие клиенты <span class="chip c" style="margin-left:6px">концентрация 70%</span></h3>
+        <p class="cap">Приход за услуги, ₸ · % от операционной выручки</p>
+        <div class="hbar" id="clients-bars"></div>
+      </div>
+      <div class="card">
+        <h3>Крупнейшие поставщики</h3>
+        <p class="cap">Расход перевозчикам и КТЖ, ₸ · % от операционных затрат</p>
+        <div class="hbar" id="suppliers-bars"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Currency + accounts -->
+  <div class="sec">
+    <div class="sec-h"><span class="n">06</span><h2>Валютный профиль и счета</h2>
+      <span class="d">валютная позиция и структура счетов</span></div>
+    <div class="grid g2">
+      <div class="card chart">
+        <h3>Валютная экспозиция</h3>
+        <p class="cap">Приход и расход по валютам (в ₸-эквиваленте). RUB и часть USD — только расход.</p>
+        <div id="cur-chart"></div>
+        <div class="legend" id="cur-legend"></div>
+      </div>
+      <div class="card">
+        <h3>Счета компании</h3>
+        <p class="cap">5 счетов · 2 банка · закрывающий остаток по всем ≈ 0</p>
+        <div style="overflow-x:auto">
+        <table class="tbl" id="acc-tbl">
+          <thead><tr><th>Банк / валюта</th><th>Приход, ₸</th><th>Расход, ₸</th><th>Опер.</th><th>Ост.</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Findings -->
+  <div class="sec">
+    <div class="sec-h"><span class="n">07</span><h2>Ключевые моменты и риски</h2>
+      <span class="d">на что обратить внимание</span></div>
+    <div class="finds" id="finds"></div>
+  </div>
+
+  <div class="note" id="note"></div>
+  <div class="foot">Источник: банковские выписки АО «Банк ЦентрКредит» и АО «Bank RBK» за 01.07.2026–31.07.2026 (5 счетов, 438 операций). Расчёт управленческий: обороты очищены от внутренних переводов между собственными счетами и конвертации валют. Категоризация — по КНП и назначению платежа. Отчёт носит аналитический характер и не заменяет бухгалтерскую/налоговую отчётность.</div>
+</div>
+
+<div id="tip"></div>
+
+<script>
+const D = {"kpi": {"gross": 10121197251.142002, "internal": 7275140298.85, "fx": 739938864.706, "ext_in": 1061984919.3299999, "ext_out": 1044133168.2559999, "net": 17851751.074, "op_rev": 1053133894.25, "op_cost": 810643571.4860001, "op_margin": 251347144.34399998, "op_margin_pct": 23.80218889285814, "tx_count": 438, "gross_profit": 242490322.76399994, "gross_margin_pct": 23.025592860316387, "op_profit": 152617114.95399997, "op_profit_pct": 14.491710483089882, "fin_out": 127913561.65, "fin_in": 8621910.97}, "cats": {"Операционные": {"inn": 1055983319.3299999, "out": 804636174.986, "net": 251347144.34399998, "n": 122}, "Проценты по депозиту (доход)": {"inn": 0, "out": 0, "net": 0, "n": 0}, "Налоги/Бюджет": {"inn": 0.0, "out": 55268774.830000006, "net": -55268774.830000006, "n": 54}, "Финансирование/Займы": {"inn": 6001600.0, "out": 126622070.32, "net": -120620470.32, "n": 18}, "Зарплата": {"inn": 0.0, "out": 52548407.0, "net": -52548407.0, "n": 19}, "Командировочные/Подотчёт": {"inn": 0.0, "out": 4993831.5200000005, "net": -4993831.5200000005, "n": 22}, "Комиссии банка": {"inn": 0.0, "out": 63909.6, "net": -63909.6, "n": 23}}, "clients": [["QAZAQ-ASTYQ GROUP", 517893763.0], ["ALBATAREEQ TRADING (ОАЭ)", 216324000.0], ["Altyn Shyghys", 164066366.25], ["ТОО ROYAL EXPORT", 29484000.0], ["ТОО \"ШыгысАгроТорг\"", 22400000.0], ["ТОО \"Экспорт-М\"", 16860000.0], ["ТОО REGAL EXPORT", 16500000.0], ["ТОО East Agro Company", 12700440.0], ["ТОО \"УСТЬ-КАМЕНОГОРСКИЙ МАСЛО-ЭКСТ", 12000000.0], ["ТОО Агро-Трейд-2030", 8700000.0]], "suppliers": [["КТЖ-Грузовые перевозки", 254594351.38], ["MEGA STOCK CO (Таиланд)", 235072080.0], ["ТрансАльянс Запад (РФ)", 111821581.75999999], ["КазТемирТранс (КТТ)", 34538828.4], ["ТОО \"АРНА\"", 33227040.0], ["ТОО «InterLog Co»", 27998080.0], ["ТОО \"PRATA\"", 27590000.0], ["LLC Altyn Trans", 21970490.376000002], ["ТОО \"ResursLogistiс (РесурсЛогисти", 16724520.0], ["ТОО \"ЭДЕМ ТРАНС\"", 14449040.0]], "daily": [["01.07.2026", 154924272.22, 31659878.78], ["02.07.2026", 80250000.0, 60914973.25], ["03.07.2026", 200000000.0, 2019843.69], ["04.07.2026", 0.0, 5000000.0], ["07.07.2026", 160187257.11, 131934499.566], ["08.07.2026", 8355375.0, 15025471.05], ["09.07.2026", 57350440.0, 233329636.7], ["10.07.2026", 0.0, 15500000.0], ["12.07.2026", 0.0, 150184.23], ["13.07.2026", 0.0, 20172000.0], ["14.07.2026", 2694125.0, 1094008.77], ["15.07.2026", 20972225.0, 21747339.0], ["16.07.2026", 846250.0, 56480500.0], ["17.07.2026", 15300000.0, 20379169.0], ["19.07.2026", 0.0, 5000000.0], ["20.07.2026", 6100600.0, 72753835.14], ["21.07.2026", 35101000.0, 21331900.0], ["22.07.2026", 70280000.0, 13948590.379999999], ["23.07.2026", 0.0, 23816211.060000002], ["24.07.2026", 15120000.0, 28835812.07], ["25.07.2026", 0.0, 5928500.0], ["26.07.2026", 0.0, 2000000.0], ["27.07.2026", 7200000.0, 7201500.0], ["28.07.2026", 216664000.0, 31492261.93], ["29.07.2026", 710000.0, 57699364.0], ["30.07.2026", 4050000.0, 153128759.68], ["31.07.2026", 5879375.0, 5588929.96]], "accounts": [{"bank": "ЦентрКредит", "cur": "KZT", "iik": "KZ76...2401", "opening": "67 511,82", "closing": "0,00", "out": 3372888990.210001, "inn": 3372821478.3900003, "out_kzt": 3372888990.210001, "inn_kzt": 3372821478.3900003, "n": 319}, {"bank": "ЦентрКредит", "cur": "USD", "iik": "KZ58...6935", "opening": "0,00", "closing": "0,00", "out": 541849.3, "inn": 541849.3, "out_kzt": 260477795.496, "inn_kzt": 260477795.496, "n": 16}, {"bank": "ЦентрКредит", "cur": "RUB", "iik": "KZ03...8368", "opening": "0,00", "closing": "0,00", "out": 18211984.0, "inn": 18211984.0, "out_kzt": 111821581.75999999, "inn_kzt": 111821581.75999999, "n": 4}, {"bank": "Bank RBK", "cur": "KZT", "iik": "KZ45...0001", "opening": "5 743,83", "closing": "0,00", "out": 1099122885.9299998, "inn": 1099117142.1, "out_kzt": 1099122885.9299998, "inn_kzt": 1099117142.1, "n": 95}, {"bank": "Bank RBK", "cur": "USD", "iik": "KZ20...0063", "opening": "0,00", "closing": "0,00", "out": 450000.0, "inn": 450000.0, "out_kzt": 216324000.0, "inn_kzt": 216324000.0, "n": 4}], "currency": {"KZT": {"inn": 845660919.3299999, "out": 671833790.9999999}, "USD": {"inn": 216324000.0, "out": 260477795.496}, "RUB": {"inn": 0.0, "out": 111821581.75999999}}, "financing": [{"date": "20.07.2026", "name": "АО \"Банк \"Bank RBK\"", "amt": 66666666.67, "dir": "OUT", "purpose": "Погашение суммы займа по договору ТОО  \"WayStar Group\", согласно кредитному дого"}, {"date": "29.07.2026", "name": "Серикбаев А.Д.", "amt": 45000000.0, "dir": "OUT", "purpose": "займ. Без НДС. Выдача краткосрочных займов (не более одного года)"}, {"date": "30.07.2026", "name": "Товарищество с ограниченной ответственностью ", "amt": 6458736.99, "dir": "OUT", "purpose": "Договор финансового лизинга № 03/26 (FLA) Счет на оплату № 33 от 29.07.2026 г."}, {"date": "20.07.2026", "name": "Серикбаев Адиль Даниярович", "amt": 5000000.0, "dir": "IN", "purpose": "Перевод с счета KZ568562204138042155 на счета KZ768562203136652401 через систему"}, {"date": "20.07.2026", "name": "АО \"Банк \"Bank RBK\"", "amt": 2170000.0, "dir": "OUT", "purpose": "Погашение начисленного вознаграждения по договору ТОО  \"WayStar Group\", согласно"}, {"date": "23.07.2026", "name": "Серикбаев А.Д.", "amt": 1700000.0, "dir": "OUT", "purpose": "займ. Без НДС. Выдача долгосрочных займов (более одного года)"}, {"date": "20.07.2026", "name": "АО \"Банк \"Bank RBK\"", "amt": 1209118.95, "dir": "OUT", "purpose": "Погашение начисленного вознаграждения по договору ТОО  \"WayStar Group\", согласно"}, {"date": "20.07.2026", "name": "АО \"Банк \"Bank RBK\"", "amt": 1022618.95, "dir": "OUT", "purpose": "Погашение начисленного вознаграждения по договору ТОО  \"WayStar Group\", согласно"}, {"date": "21.07.2026", "name": "Серикбаев Адиль Даниярович", "amt": 1000000.0, "dir": "IN", "purpose": "Перевод с счета KZ568562204138042155 на счета KZ768562203136652401 через систему"}, {"date": "24.07.2026", "name": "Серикбаев А.Д.", "amt": 500000.0, "dir": "OUT", "purpose": "займ. Без НДС. Выдача долгосрочных займов (более одного года)"}, {"date": "25.07.2026", "name": "Серикбаев А.Д.", "amt": 500000.0, "dir": "OUT", "purpose": "займ. Без НДС. Выдача долгосрочных займов (более одного года)"}, {"date": "25.07.2026", "name": "Серикбаев А.Д.", "amt": 428500.0, "dir": "OUT", "purpose": "займ. Без НДС. Выдача долгосрочных займов (более одного года)"}, {"date": "20.07.2026", "name": "АО \"Банк \"Bank RBK\"", "amt": 397833.33, "dir": "OUT", "purpose": "Погашение начисленного вознаграждения по договору ТОО  \"WayStar Group\", согласно"}, {"date": "20.07.2026", "name": "АО \"Банк \"Bank RBK\"", "amt": 263881.05, "dir": "OUT", "purpose": "Погашение начисленного вознаграждения по договору ТОО  \"WayStar Group\", согласно"}, {"date": "20.07.2026", "name": "АО \"Банк \"Bank RBK\"", "amt": 227333.33, "dir": "OUT", "purpose": "Погашение начисленного вознаграждения по договору ТОО  \"WayStar Group\", согласно"}, {"date": "20.07.2026", "name": "АО \"Банк \"Bank RBK\"", "amt": 77381.05, "dir": "OUT", "purpose": "Погашение начисленного вознаграждения по договору ТОО  \"WayStar Group\", согласно"}, {"date": "21.07.2026", "name": "Данияр Алим", "amt": 1000.0, "dir": "IN", "purpose": "Погашение краткосрочного займа (не более одного года). Безналичный перевод. ИИН/"}, {"date": "20.07.2026", "name": "Данияр Алим", "amt": 600.0, "dir": "IN", "purpose": "Перевод с счета KZ658562204136676815 на счета KZ768562203136652401 через систему"}], "cost_geo": {"foreign": 369864049.736, "domestic": 434772125.25}, "costs": {"rev": 1053133894.25, "cogs": 810643571.4860001, "gross": 242490322.76399994, "fot": 61772832.519999996, "adm": 15307693.76, "tax": 12792681.53, "fin": 127913561.65, "oth": 15702827.309999999, "opprofit": 152617114.95399997, "fin_in": 8621910.97, "other_in": 229114.11, "groups": [{"name": "Себестоимость", "total": 810643571.4860001, "subs": [["Зарубежные перевозчики/экспедиторы", 369864049.736, 8], ["Тариф КТЖ (ж/д перевозки)", 254594351.38, 24], ["Аренда/предоставление вагонов", 102335320.77, 12], ["Прочие ж/д и ТЭУ услуги", 43687120.0, 3], ["Операторы вагонов (КТТ и др.)", 34538828.4, 3], ["Ремонт вагонов и узлов", 5623901.199999999, 14]]}, {"name": "ФОТ", "total": 61772832.519999996, "subs": [["Зарплата", 53198407.0, 20], ["Командировки и подотчёт", 8574425.52, 30]]}, {"name": "Админ/офис", "total": 15307693.76, "subs": [["Офис, аренда помещений, хоз.", 9626462.08, 6], ["Проф. услуги (бухг./юр./конс.)", 3729916.56, 9], ["Связь и ИТ", 1019895.12, 8], ["Маркетинг и представит.", 823760.0, 2], ["Хоз. расходы и материалы", 71655.0, 2], ["Страхование", 36005.0, 1]]}, {"name": "Налоги", "total": 12792681.53, "subs": [["Налоги и отчисления", 12792681.53, 12]]}, {"name": "Финансовые", "total": 127913561.65, "subs": [["Обслуживание кредита (тело + %)", 72034833.33, 8], ["Выданные займы (связ. лица)", 48128500.0, 5], ["Финансовый лизинг", 6458736.99, 1], ["Банковские комиссии", 1291491.33, 35]]}, {"name": "Прочее", "total": 15702827.309999999, "subs": [["Возврат средств контрагенту", 10000000.0, 1], ["Прочие расходы", 5502827.31, 6], ["Спонсорство / благотвор.", 200000.0, 1]]}]}};
+const S=getComputedStyle(document.documentElement);
+const col=n=>S.getPropertyValue(n).trim();
+const SER=['--s1','--s2','--s3','--s4','--s5','--s6','--s7','--s8'].map(col);
+function fmt(x){x=Math.round(x);const s=Math.abs(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ');return (x<0?'−':'')+s;}
+function fmtM(x){return (x/1e6).toLocaleString('ru-RU',{maximumFractionDigits:1})+' млн';}
+function fmtB(x){return (x/1e9).toLocaleString('ru-RU',{maximumFractionDigits:2})+' млрд';}
+function human(x){const a=Math.abs(x);if(a>=1e9)return fmtB(x)+' ₸';if(a>=1e6)return fmtM(x)+' ₸';return fmt(x)+' ₸';}
+
+// tooltip
+const tip=document.getElementById('tip');
+function showTip(e,html){tip.innerHTML=html;tip.style.opacity=1;moveTip(e);}
+function moveTip(e){const p=12;let x=e.clientX+p,y=e.clientY+p;const r=tip.getBoundingClientRect();
+  if(x+r.width>innerWidth-8)x=e.clientX-r.width-p;if(y+r.height>innerHeight-8)y=e.clientY-r.height-p;
+  tip.style.left=x+'px';tip.style.top=y+'px';}
+function hideTip(){tip.style.opacity=0;}
+function bind(el,html){el.addEventListener('mousemove',e=>showTip(e,html));el.addEventListener('mouseleave',hideTip);}
+
+// thesis numbers
+const K=D.kpi;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+$('t-gross').textContent=fmtB(K.gross)+' ₸';
+$('t-ext').textContent=fmtM(K.ext_in)+' ₸';
+$('t-out').textContent=fmtM(K.ext_out)+' ₸';
+$('t-margin').textContent=fmtM(K.op_profit)+' ₸';
+$('t-mp').textContent=K.op_profit_pct.toFixed(1)+'%';
+
+// KPIs
+const kpis=[
+ {lab:'Валовой оборот',val:fmtB(K.gross),u:'₸',sub:'по 5 счетам · 438 операций',strip:'--muted'},
+ {lab:'Операционная выручка',val:fmtB(K.op_rev),u:'₸',sub:'реальные поступления за услуги',strip:'--s3'},
+ {lab:'Себестоимость',val:fmtM(K.op_cost),u:'₸',sub:'перевозчики, КТЖ, аренда вагонов',strip:'--s2'},
+ {lab:'Валовая прибыль',val:fmtM(K.gross_profit),u:'₸',sub:'маржа '+K.gross_margin_pct.toFixed(1)+'%',strip:'--s1'},
+ {lab:'Операционная прибыль',val:fmtM(K.op_profit),u:'₸',sub:'после ФОТ, админ, налогов',strip:'--good',chip:['g','▲ '+K.op_profit_pct.toFixed(1)+'%']},
+ {lab:'Чистый денежный поток',val:'+'+fmtM(K.net),u:'₸',sub:'после всех оттоков, вкл. кредит',strip:'--good'},
+];
+document.getElementById('kpis').innerHTML=kpis.map(k=>`
+ <div class="kpi">
+   <div class="strip" style="background:${col(k.strip)}"></div>
+   <div class="k-lab">${k.lab}</div>
+   <div class="k-val tnum">${k.val}<span class="u">${k.u}</span></div>
+   <div class="k-sub">${k.chip?`<span class="chip ${k.chip[0]}">${k.chip[1]}</span> `:''}${k.sub}</div>
+ </div>`).join('');
+
+// Decomposition
+const dec=[
+ {lab:'Внутренние переводы',v:K.internal,c:col('--muted'),note:'между своими 5 счетами'},
+ {lab:'Конвертация валют',v:K.fx,c:col('--s6'),note:'покупка/продажа USD, RUB'},
+ {lab:'Внешние операции',v:K.ext_in+K.ext_out,c:col('--s1'),note:'реальный бизнес'},
+];
+const decTot=dec.reduce((a,b)=>a+b.v,0);
+document.getElementById('decomp-track').innerHTML=dec.map(s=>{
+  const p=s.v/decTot*100;
+  return `<div class="seg" data-h="<b>${s.lab}</b><br>${human(s.v)} · ${p.toFixed(0)}%<br><span style='opacity:.8'>${s.note}</span>" style="flex:${s.v};background:${s.c}"><span>${p.toFixed(0)}%</span></div>`;
+}).join('');
+document.querySelectorAll('#decomp-track .seg').forEach(el=>bind(el,el.dataset.h));
+document.getElementById('decomp-lgd').innerHTML=dec.map(s=>`<div class="li"><span class="sw" style="background:${s.c}"></span>${s.lab} — <b>&nbsp;${human(s.v)}</b> <span style="color:var(--muted)">(${(s.v/decTot*100).toFixed(0)}%)</span></div>`).join('');
+
+// Detailed cost structure (grouped by economic sense)
+const GRPCOL={'Себестоимость':SER[0],'ФОТ':SER[2],'Админ/офис':SER[3],'Налоги':SER[1],'Финансовые':SER[5],'Прочее':col('--muted')};
+const groups=D.costs.groups;
+const cTot=groups.reduce((a,g)=>a+g.total,0);
+const cMax=Math.max(...groups.flatMap(g=>g.subs.map(s=>s[1])));
+let cH='';
+groups.forEach(g=>{
+  cH+=`<div class="row" style="grid-template-columns:1fr auto;margin-top:4px" data-h="<b>${esc(g.name)}</b><br>${human(g.total)} · ${(g.total/cTot*100).toFixed(1)}% расхода">
+     <div class="nm" style="color:var(--ink);font-weight:800;display:flex;align-items:center;gap:7px"><span class="sw" style="width:10px;height:10px;border-radius:3px;background:${GRPCOL[g.name]}"></span>${g.name}</div>
+     <div class="vv tnum">${fmtM(g.total)}<span class="pct">${(g.total/cTot*100).toFixed(0)}%</span></div></div>`;
+  g.subs.forEach(s=>{
+    const nm=esc(s[0]);
+    cH+=`<div class="row" data-h="<b>${nm}</b><br>${human(s[1])} · ${(s[1]/cTot*100).toFixed(1)}% · ${s[2]} оп.">
+       <div class="nm" style="padding-left:17px" title="${nm}">${nm}</div>
+       <div class="tr"><div class="fl" style="width:${s[1]/cMax*100}%;background:${GRPCOL[g.name]};opacity:.85"></div></div>
+       <div class="vv tnum">${fmtM(s[1])}<span class="pct">${(s[1]/cTot*100).toFixed(0)}%</span></div></div>`;
+  });
+});
+document.getElementById('cost-bars').innerHTML=cH;
+document.querySelectorAll('#cost-bars .row').forEach(el=>bind(el,el.dataset.h));
+document.getElementById('cost-legend').innerHTML=groups.map(g=>`<div class="li"><span class="sw" style="background:${GRPCOL[g.name]}"></span>${g.name}</div>`).join('');
+
+// generic horizontal bar renderer
+function renderBars(id,items,total,color){
+  const mx=Math.max(...items.map(x=>x[1]));
+  document.getElementById(id).innerHTML=items.map((x,i)=>{
+    const pct=x[1]/total*100;
+    const nm=esc(x[0]);
+    return `<div class="row" data-h="<b>${nm}</b><br>${human(x[1])} · ${pct.toFixed(1)}%">
+      <div class="nm" title="${nm}">${nm}</div>
+      <div class="tr"><div class="fl" style="width:${x[1]/mx*100}%;background:${color}"></div></div>
+      <div class="vv tnum">${fmtM(x[1])}<span class="pct">${pct.toFixed(0)}%</span></div></div>`;
+  }).join('');
+  document.querySelectorAll('#'+id+' .row').forEach(el=>bind(el,el.dataset.h));
+}
+const cliTot=D.clients.reduce((a,b)=>a+b[1],0)+ (K.op_rev - D.clients.reduce((a,b)=>a+b[1],0)); // op revenue
+renderBars('clients-bars',D.clients,K.op_rev,SER[2]);
+renderBars('suppliers-bars',D.suppliers,K.op_cost,SER[1]);
+
+// Waterfall — P&L cascade
+(function(){
+  const C=D.costs;
+  const W=560,H=300,mL=8,mR=8,mT=16,mB=46;
+  const iw=W-mL-mR, ih=H-mT-mB;
+  const seq=[
+    {lab:'Выручка',delta:C.rev,kind:'total',note:'операционные поступления'},
+    {lab:'Себе-\nстоимость',delta:-C.cogs,kind:'neg',note:'перевозчики, КТЖ, аренда вагонов'},
+    {lab:'Валовая\nприбыль',kind:'sub',note:'маржа '+K.gross_margin_pct.toFixed(1)+'%'},
+    {lab:'ФОТ',delta:-C.fot,kind:'neg',note:'зарплата + командировки'},
+    {lab:'Админ,\nофис',delta:-C.adm,kind:'neg',note:'офис, связь, проф. услуги'},
+    {lab:'Налоги',delta:-C.tax,kind:'neg',note:'ИПН, НДС, соц. отчисления'},
+    {lab:'Операц.\nприбыль',kind:'end',note:'рентабельность '+K.op_profit_pct.toFixed(1)+'%'},
+  ];
+  const maxV=C.rev*1.05;
+  const y=v=>mT+ih-(v/maxV)*ih;
+  const n=seq.length, gap=13, bw=(iw-gap*(n-1))/n;
+  let svg=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="P&L каскад">`;
+  for(let g=0;g<=4;g++){const gv=maxV*g/4;const yy=y(gv);
+    svg+=`<line class="grid-l" x1="${mL}" x2="${W-mR}" y1="${yy}" y2="${yy}"/>`;
+    svg+=`<text class="tnum" x="${W-mR}" y="${yy-3}" text-anchor="end" fill="${col('--muted')}" font-size="9.5">${(gv/1e6).toFixed(0)} млн</text>`;}
+  let run=0;
+  seq.forEach((s,i)=>{
+    const x=mL+i*(bw+gap);
+    let top,bot,fill,val;
+    if(s.kind==='total'){run=s.delta;top=y(run);bot=y(0);fill=col('--s3');val=run;}
+    else if(s.kind==='sub'){top=y(run);bot=y(0);fill=col('--s1');val=run;}
+    else if(s.kind==='end'){top=y(run);bot=y(0);fill=col('--good');val=run;}
+    else{const from=run;run=run+s.delta;top=y(Math.max(from,run));bot=y(Math.min(from,run));fill=col('--s2');val=s.delta;}
+    const h=Math.max(bot-top,2);
+    svg+=`<rect class="wf" x="${x}" y="${top}" width="${bw}" height="${h}" rx="3" fill="${fill}" data-h="<b>${s.lab.replace(/\n/g,' ')}</b><br>${(val<0?'−':'')+human(Math.abs(val))}<br><span style='opacity:.8'>${esc(s.note)}</span>"/>`;
+    if(i<seq.length-1 && s.kind!=='end'){const cy=y(run);svg+=`<line x1="${x+bw}" x2="${x+bw+gap}" y1="${cy}" y2="${cy}" stroke="${col('--baseline')}" stroke-dasharray="2 2"/>`;}
+    svg+=`<text class="tnum" x="${x+bw/2}" y="${top-4}" text-anchor="middle" font-size="9.5" font-weight="700" fill="${col('--ink')}">${(val<0?'−':'')+(Math.abs(val)/1e6).toFixed(0)}</text>`;
+    s.lab.split('\n').forEach((ln,li)=>{svg+=`<text x="${x+bw/2}" y="${H-mB+15+li*11}" text-anchor="middle" font-size="9" fill="${col('--muted')}">${ln}</text>`;});
+  });
+  svg+=`<line class="baseline" x1="${mL}" x2="${W-mR}" y1="${y(0)}" y2="${y(0)}"/></svg>`;
+  document.getElementById('waterfall').innerHTML=svg;
+  document.querySelectorAll('#waterfall .wf').forEach(el=>bind(el,el.dataset.h));
+})();
+
+// Daily chart (grouped bars in/out)
+(function(){
+  const dd=D.daily; // [date,in,out]
+  const W=1180,H=300,mL=44,mR=12,mT=14,mB=40;
+  const iw=W-mL-mR, ih=H-mT-mB;
+  const mx=Math.max(...dd.map(d=>Math.max(d[1],d[2])));
+  const y=v=>mT+ih-(v/mx)*ih;
+  const n=dd.length, slot=iw/n, bw=Math.min(slot*0.36,13);
+  let svg=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Денежный поток по дням">`;
+  for(let g=0;g<=4;g++){const gv=mx*g/4;const yy=y(gv);
+    svg+=`<line class="grid-l" x1="${mL}" x2="${W-mR}" y1="${yy}" y2="${yy}"/>`;
+    svg+=`<text class="tnum" x="${mL-6}" y="${yy+3}" text-anchor="end" fill="${col('--muted')}" font-size="9.5">${(gv/1e6).toFixed(0)}</text>`;}
+  dd.forEach((d,i)=>{
+    const cx=mL+slot*i+slot/2;
+    const dayN=d[0].slice(0,2);
+    const xi=cx-bw-1, xo=cx+1;
+    svg+=`<rect class="db" x="${xi}" y="${y(d[1])}" width="${bw}" height="${Math.max(mT+ih-y(d[1]),0)}" rx="2.5" fill="${col('--s3')}" data-h="<b>${d[0]}</b><br>Приток: ${human(d[1])}<br>Отток: ${human(d[2])}<br>Нетто: ${(d[1]-d[2]>=0?'+':'−')+human(Math.abs(d[1]-d[2]))}"/>`;
+    svg+=`<rect class="db" x="${xo}" y="${y(d[2])}" width="${bw}" height="${Math.max(mT+ih-y(d[2]),0)}" rx="2.5" fill="${col('--s2')}" data-h="<b>${d[0]}</b><br>Приток: ${human(d[1])}<br>Отток: ${human(d[2])}<br>Нетто: ${(d[1]-d[2]>=0?'+':'−')+human(Math.abs(d[1]-d[2]))}"/>`;
+    if(i%2===0)svg+=`<text x="${cx}" y="${H-mB+16}" text-anchor="middle" font-size="9" fill="${col('--muted')}">${dayN}</text>`;
+  });
+  svg+=`<line class="baseline" x1="${mL}" x2="${W-mR}" y1="${y(0)}" y2="${y(0)}"/>`;
+  svg+=`</svg>`;
+  document.getElementById('daily-chart').innerHTML=svg;
+  document.querySelectorAll('#daily-chart .db').forEach(el=>bind(el,el.dataset.h));
+  document.getElementById('daily-legend').innerHTML=
+    `<div class="li"><span class="sw" style="background:${col('--s3')}"></span>Приток (поступления)</div>
+     <div class="li"><span class="sw" style="background:${col('--s2')}"></span>Отток (платежи)</div>`;
+})();
+
+// Currency chart
+(function(){
+  const cur=D.currency;
+  const order=['KZT','USD','RUB'];
+  const rows=order.map(k=>({k,inn:cur[k].inn,out:cur[k].out}));
+  const W=560,H=250,mL=44,mR=12,mT=14,mB=34;
+  const iw=W-mL-mR, ih=H-mT-mB;
+  const mx=Math.max(...rows.flatMap(r=>[r.inn,r.out]));
+  const y=v=>mT+ih-(v/mx)*ih;
+  const n=rows.length, slot=iw/n, bw=Math.min(slot*0.28,54);
+  let svg=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Валютная экспозиция">`;
+  for(let g=0;g<=4;g++){const gv=mx*g/4;const yy=y(gv);
+    svg+=`<line class="grid-l" x1="${mL}" x2="${W-mR}" y1="${yy}" y2="${yy}"/>`;
+    svg+=`<text class="tnum" x="${mL-6}" y="${yy+3}" text-anchor="end" fill="${col('--muted')}" font-size="9.5">${(gv/1e6).toFixed(0)}</text>`;}
+  rows.forEach((r,i)=>{
+    const cx=mL+slot*i+slot/2;
+    const xi=cx-bw-3,xo=cx+3;
+    svg+=`<rect class="cb" x="${xi}" y="${y(r.inn)}" width="${bw}" height="${Math.max(mT+ih-y(r.inn),0)}" rx="3" fill="${col('--s3')}" data-h="<b>${r.k}</b><br>Приток: ${human(r.inn)}"/>`;
+    svg+=`<rect class="cb" x="${xo}" y="${y(r.out)}" width="${bw}" height="${Math.max(mT+ih-y(r.out),0)}" rx="3" fill="${col('--s2')}" data-h="<b>${r.k}</b><br>Расход: ${human(r.out)}"/>`;
+    svg+=`<text x="${cx}" y="${H-mB+16}" text-anchor="middle" font-size="11" font-weight="700" fill="${col('--ink')}">${r.k}</text>`;
+  });
+  svg+=`<line class="baseline" x1="${mL}" x2="${W-mR}" y1="${y(0)}" y2="${y(0)}"/></svg>`;
+  document.getElementById('cur-chart').innerHTML=svg;
+  document.querySelectorAll('#cur-chart .cb').forEach(el=>bind(el,el.dataset.h));
+  document.getElementById('cur-legend').innerHTML=
+    `<div class="li"><span class="sw" style="background:${col('--s3')}"></span>Приток</div>
+     <div class="li"><span class="sw" style="background:${col('--s2')}"></span>Расход</div>
+     <div class="li" style="color:var(--muted)">RUB — только закупки; часть USD-расхода не покрыта USD-выручкой</div>`;
+})();
+
+// Accounts table
+(function(){
+  const banks={'ЦентрКредит':col('--s1'),'Bank RBK':col('--s6')};
+  document.querySelector('#acc-tbl tbody').innerHTML=D.accounts.map(a=>`
+   <tr>
+     <td class="bank"><span class="dot" style="background:${banks[a.bank]||col('--muted')}"></span>${a.bank} · ${a.cur}</td>
+     <td class="v tnum">${fmtM(a.inn_kzt)}</td>
+     <td class="v tnum">${fmtM(a.out_kzt)}</td>
+     <td class="v tnum">${a.n}</td>
+     <td class="v"><span class="badge">${a.closing} ${a.cur}</span></td>
+   </tr>`).join('');
+})();
+
+// Findings
+const finds=[
+ {t:'c',ic:'!',h:'Критическая концентрация клиентов',
+  p:'Один клиент <span class="big">QAZAQ-ASTYQ GROUP даёт 49%</span> операционной выручки, топ-2 (+ ALBATAREEQ, ОАЭ) — <span class="big">70%</span>. Потеря любого из них резко ударит по потоку. Нужна диверсификация клиентской базы.'},
+ {t:'w',ic:'₸',h:'Нулевой денежный буфер',
+  p:'Остатки по <span class="big">всем 5 счетам к концу месяца ≈ 0</span>. Деньги сразу «выметаются». Комфортной подушки ликвидности нет — любой кассовый разрыв придётся закрывать займами.'},
+ {t:'w',ic:'⇄',h:'Валютный риск',
+  p:'RUB-счёт — <span class="big">только расход 112 млн ₸</span> (закупки в РФ), по USD расход (260 млн) превышает приток (216 млн). Выручка преимущественно в тенге — при девальвации маржа сжимается. Стоит рассмотреть хеджирование.'},
+ {t:'i',ic:'⛭',h:'Структура себестоимости',
+  p:'Себестоимость <span class="big">810 млн ₸ (77% расхода)</span>: зарубежные перевозчики 370 млн (MEGA STOCK, ТрансАльянс, Altyn Trans), тариф КТЖ 255 млн, <span class="big">аренда вагонов 102 млн</span>, операторы (КТТ) 35 млн, ремонт 6 млн. Маржа зажата внешними ж/д тарифами.'},
+ {t:'i',ic:'%',h:'Займы связанным лицам и кредит',
+  p:'Вне P&amp;L прошли финансовые оттоки <span class="big">128 млн ₸</span>: погашение кредита Bank RBK 67 млн + 5 млн %, выдано займов физлицу <span class="big">Серикбаеву А.Д. 48 млн</span>, лизинг 6 млн. Отвлечение средств на займы учредителю/руководителю — зона внимания собственника.'},
+ {t:'g',ic:'▲',h:'Прибыльная бизнес-модель',
+  p:'Выручка 1 053 млн − себестоимость 810 млн = валовая прибыль <span class="big">242 млн (23%)</span>. После ФОТ (62 млн), офиса/админ (15 млн) и налогов (13 млн) операционная прибыль <span class="big">153 млн ₸ (14,5%)</span> — здоровый уровень для ТЭО.'},
+];
+document.getElementById('finds').innerHTML=finds.map(f=>`
+ <div class="find ${f.t}">
+   <div class="ft"><div class="ico">${f.ic}</div><h4>${f.h}</h4></div>
+   <p>${f.p}</p>
+ </div>`).join('');
+
+document.getElementById('note').innerHTML='Категоризация выполнена по назначению платежа и КНП с приоритетом смысла: «аренда/предоставление вагонов и цистерн» отнесена к себестоимости, а «субаренда офиса», уборка и аренда оборудования — к административным расходам (это разные статьи). Финансовые оттоки (погашение тела кредита, выданные займы, лизинг) показаны отдельно от P&L — это движение денег, а не расход прибыли. Операционная прибыль рассчитана по кассовому методу и не является чистой прибылью по бухучёту (не учитывает амортизацию, начисления и незакрытые взаиморасчёты).';
+
+// theme toggle
+document.getElementById('themebtn').addEventListener('click',()=>{
+  const r=document.documentElement;
+  const cur=r.getAttribute('data-theme');
+  const dark=cur? cur==='dark' : matchMedia('(prefers-color-scheme:dark)').matches;
+  r.setAttribute('data-theme',dark?'light':'dark');
+  setTimeout(()=>location.reload(),30);
+});
+</script>
