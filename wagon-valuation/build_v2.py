@@ -145,10 +145,47 @@ PB = "Параметры!$B$"
 def pmref(r): return f"{PB}{r}"
 
 # =====================================================================
+# Прайс собственника (asking prices by model+year, as provided)
+# =====================================================================
+if "Прайс" in wb.sheetnames: del wb["Прайс"]
+pr = wb.create_sheet("Прайс", 2)
+pr.sheet_view.showGridLines = False
+PRICE_ROWS = [   # (модель, год, кол-во, цена ед. без НДС)
+    ("15-1219-1П", 2020, 60, 4125000),
+    ("15-150-04П", 2011, 21, 2461000),
+    ("15-150-04П", 2012,  7, 2621500),
+    ("15-150-04П", 2015, 14, 3103000),
+    ("15-1755П",   2013, 24, 2782000),
+    ("15-1755П",   2014,  5, 2942500),
+    ("15-5103-7П", 2011, 23, 2461000),
+    ("15-5103-7П", 2012,  3, 2621500),
+    ("15-5103-7П", 2015,  9, 3103000),
+]
+pr.cell(1,1,"Цены собственника (без НДС), по модели и году постройки").font = TITLE
+pr.merge_cells("A1:E1")
+prh = ["Модель вагона","Год постройки","Кол-во","Цена за ед. без НДС, ₽","Итого без НДС, ₽"]
+for c,name in enumerate(prh,1):
+    cc=pr.cell(2,c,name); cc.font=HEADER; cc.fill=HFILL; cc.alignment=CTR; cc.border=BORD
+for i,(m,y,cnt,price) in enumerate(PRICE_ROWS):
+    r=3+i
+    pr.cell(r,1,m).font=F_();   pr.cell(r,1).border=BORD
+    pr.cell(r,2,y).font=F_();   pr.cell(r,2).border=BORD; pr.cell(r,2).alignment=CTR
+    pr.cell(r,3,cnt).font=F_(); pr.cell(r,3).border=BORD; pr.cell(r,3).alignment=CTR
+    b=pr.cell(r,4,price); b.font=BLUE; b.number_format=RUB; b.border=BORD   # source input
+    e=pr.cell(r,5,f"=C{r}*D{r}"); e.font=BLACK; e.number_format=RUB; e.border=BORD
+tr=3+len(PRICE_ROWS)
+pr.cell(tr,1,"ИТОГО").font=F_(b=True)
+pr.cell(tr,3,f"=SUM(C3:C{tr-1})").font=F_(b=True); pr.cell(tr,3).alignment=CTR
+pr.cell(tr,5,f"=SUM(E3:E{tr-1})").font=F_(b=True); pr.cell(tr,5).number_format=RUB
+for col,w in {"A":26,"B":15,"C":9,"D":22,"E":22}.items(): pr.column_dimensions[col].width=w
+PRICE_FIRST, PRICE_LAST = 3, tr-1
+def PA(col): return f"Прайс!${col}${PRICE_FIRST}:${col}${PRICE_LAST}"
+
+# =====================================================================
 # Оценка  (v2 per-wagon)
 # =====================================================================
 if "Оценка" in wb.sheetnames: del wb["Оценка"]
-ws = wb.create_sheet("Оценка", 2)
+ws = wb.create_sheet("Оценка", 3)
 ws.sheet_view.showGridLines = False
 ws.freeze_panes = "A3"
 
@@ -232,7 +269,7 @@ for i in range(N):
     S("Z", f"=Y{r}*{pmref(19)}")
     # final
     S("AA", f"=MAX(0,P{r}-X{r}-Z{r})")
-    S("AB", None)                                   # market input (yellow)
+    S("AB", f"=SUMIFS({PA('D')},{PA('A')},B{r},{PA('B')},C{r})")   # цена собственника
     S("AC", f'=IF(AB{r}="","",AB{r}-AA{r})')
     ws.cell(r, ci("AD")).value = h["v1z"]           # v1 static reference
 
@@ -253,7 +290,7 @@ for i in range(N):
     for col in grncols: ws.cell(r, ci(col)).font = GREEN
     ws.cell(r, ci("AD")).font = F_(color="808080")          # v1 grey
     ws.cell(r, ci("AA")).font = F_(b=True)                   # headline bold
-    ws.cell(r, ci("AB")).fill = YELLOW; ws.cell(r, ci("AB")).font = BLUE
+    ws.cell(r, ci("AB")).font = GREEN
     ws.cell(r, ci("Q")).number_format = "dd.mm.yyyy"
     ws.cell(r, ci("R")).number_format = "dd.mm.yyyy"
 # widths
@@ -268,13 +305,15 @@ DATA_FIRST, DATA_LAST = 3, 3 + N - 1
 # Свод
 # =====================================================================
 if "Свод" in wb.sheetnames: del wb["Свод"]
-sv = wb.create_sheet("Свод", 3)
+sv = wb.create_sheet("Свод", 4)
 sv.sheet_view.showGridLines = False
 sv.column_dimensions["A"].width = 46
 sv.column_dimensions["B"].width = 18
 sv.column_dimensions["C"].width = 60
-rng = f"Оценка!$AA${DATA_FIRST}:$AA${DATA_LAST}"
+rng   = f"Оценка!$AA${DATA_FIRST}:$AA${DATA_LAST}"
 v1rng = f"Оценка!$AD${DATA_FIRST}:$AD${DATA_LAST}"
+abrng = f"Оценка!$AB${DATA_FIRST}:$AB${DATA_LAST}"
+acrng = f"Оценка!$AC${DATA_FIRST}:$AC${DATA_LAST}"
 rows = [
     ("Свод оценки — методика v2", None, None, "title"),
     ("Компонентный затратный подход: стоимость = Σ(доля компонента × остаточная %) − обязательства по ремонтам.", None, None, "note"),
@@ -290,6 +329,15 @@ rows = [
     ("Разница средних v2 − v1, ₽", f"=AVERAGE({rng})-AVERAGE({v1rng})", "Влияние новой методики", "d"),
     ("Разница средних v2 − v1, %", f"=(AVERAGE({rng})-AVERAGE({v1rng}))/AVERAGE({v1rng})*100", "", "dp"),
     ("", None, None, "blank"),
+    ("Сравнение с ценой собственника", "Значение", "Комментарий", "hdr"),
+    ("Итого прайс собственника, ₽", f"=SUM({abrng})", "Сумма запрошенных цен (без НДС), лист «Прайс»", "d"),
+    ("Итого оценка v2 (износ), ₽", f"=SUM({rng})", "Компонентная стоимость − обязательства", "d"),
+    ("Переоценка прайса к v2, ₽", f"=SUM({abrng})-SUM({rng})", "Насколько прайс выше стоимости по износу", "d"),
+    ("Переоценка прайса к v2, %", f"=(SUM({abrng})-SUM({rng}))/SUM({rng})*100", "Прайс дороже оценки на столько", "dp"),
+    ("Итого оценка v1 (справочно), ₽", f"=SUM({v1rng})", "Почти равна прайсу — v1, как и прайс, ценит по возрасту", "d"),
+    ("Вагонов: прайс ВЫШЕ оценки v2 (переоценены)", f'=COUNTIF({acrng},">0")', "Есть основание торговаться вниз", "d"),
+    ("Вагонов: прайс НИЖЕ оценки v2 (привлекательны)", f'=COUNTIF({acrng},"<0")', "Прайс уже ниже стоимости по состоянию", "d"),
+    ("", None, None, "blank"),
     ("Что изменено в методике v2 против v1:", None, None, "hdr2"),
     ("1. Компонентная декомпозиция", "", "Котёл+рама / тележки(литьё) / КП / прочее вместо 50-на-50", "b"),
     ("2. Индивидуальный срок службы", "", "Износ котла — по дате СС из данных, не общий 32 г.", "b"),
@@ -304,7 +352,7 @@ rows = [
     ("• Толщина гребня", "", "В источнике = 0 (не собрана). Добавить в износ КП после замера.", "w"),
     ("• Доли компонентов и цены ремонтов", "", "Заданы как допущения на листе «Параметры» — заменить фактикой.", "w"),
     ("• Состояние котла (коррозия, толщина стенки)", "", "Нет в данных; износ тела аппроксимирован сроком службы.", "w"),
-    ("• Цены продавца / рынок", "", "Колонка AB пуста — заполнить для рыночной сверки.", "w"),
+    ("• Единая цена новой для всех моделей", "", "2020 г. (15-1219-1П, 69 тн) — премиальная модель; при единой цене новой её оценка занижена, переоценка прайса по ней завышена.", "w"),
     ("• Функциональный / внешний износ", "", "Не учтён (тип цистерны, ставка аренды, регуляторные лимиты).", "w"),
 ]
 r = 1
@@ -330,6 +378,33 @@ for label, val, note, style in rows:
         b.number_format = RUB if style=="d" else ('0.0"%"' if style=="dp" else RUB)
     c3 = sv.cell(r,3,note); c3.font = F_(9,color="808080"); c3.alignment = LEFT
     r += 1
+
+# ---- per-group comparison table (model × year): seller price vs v2 ----
+r += 1
+gt_hdr = ["Модель / год", "Кол-во", "Прайс ед., ₽", "Оценка v2 ед., ₽", "Δ прайс−v2, ₽", "Δ, %"]
+for c, name in enumerate(gt_hdr, 1):
+    cc = sv.cell(r, c, name); cc.font = HEADER; cc.fill = HFILL; cc.alignment = CTR; cc.border = BORD
+r += 1
+bcol = f"Оценка!$B${DATA_FIRST}:$B${DATA_LAST}"
+ccol = f"Оценка!$C${DATA_FIRST}:$C${DATA_LAST}"
+aacol = f"Оценка!$AA${DATA_FIRST}:$AA${DATA_LAST}"
+for (m, y, cnt, price) in PRICE_ROWS:
+    crit = f'{bcol},"{m}",{ccol},{y}'
+    sv.cell(r,1, f"{m} · {y}").font = F_(); sv.cell(r,1).border=BORD; sv.cell(r,1).alignment=LEFT
+    sv.cell(r,2, f"=COUNTIFS({crit})").border=BORD; sv.cell(r,2).alignment=CTR
+    c3=sv.cell(r,3, f'=AVERAGEIFS({abrng.replace("$AB","$AB")},{crit})'); c3.number_format=RUB; c3.border=BORD
+    c4=sv.cell(r,4, f"=AVERAGEIFS({aacol},{crit})"); c4.number_format=RUB; c4.border=BORD
+    c5=sv.cell(r,5, f"=C{r}-D{r}"); c5.number_format=RUB; c5.border=BORD
+    c6=sv.cell(r,6, f"=IF(C{r}=0,0,(C{r}-D{r})/C{r}*100)"); c6.number_format='0.0"%"'; c6.border=BORD
+    r += 1
+# total row
+sv.cell(r,1,"ИТОГО / среднее").font=F_(b=True); sv.cell(r,1).border=BORD
+sv.cell(r,2, f"=SUM(B{r-9}:B{r-1})").font=F_(b=True); sv.cell(r,2).border=BORD; sv.cell(r,2).alignment=CTR
+sv.cell(r,3, f"=SUM({abrng})/166").font=F_(b=True); sv.cell(r,3).number_format=RUB; sv.cell(r,3).border=BORD
+sv.cell(r,4, f"=SUM({rng})/166").font=F_(b=True); sv.cell(r,4).number_format=RUB; sv.cell(r,4).border=BORD
+sv.cell(r,5, f"=C{r}-D{r}").font=F_(b=True); sv.cell(r,5).number_format=RUB; sv.cell(r,5).border=BORD
+sv.cell(r,6, f"=(C{r}-D{r})/C{r}*100").font=F_(b=True); sv.cell(r,6).number_format='0.0"%"'; sv.cell(r,6).border=BORD
+for col,w in {"D":18,"E":16,"F":9}.items(): sv.column_dimensions[col].width=w
 
 wb.active = wb.sheetnames.index("Свод")
 # force full recalculation when the file is opened (formulas carry no cached values)
